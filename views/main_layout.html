@@ -1,0 +1,25 @@
+[[define "main_layout"]]
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>[[template "title" .]]</title>
+
+    <link rel="stylesheet" href="/assets/stylesheets/common.css">
+
+    <!-- development only -->
+    <!-- https://tailwindcss.com/docs/installation/play-cdn -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+  <header class="">
+  </header>
+  <main class="">
+  [[template "body" .]]
+  </main>
+
+  [[template "page-javascript" .]]
+  </body>
+</html>
+[[end]]

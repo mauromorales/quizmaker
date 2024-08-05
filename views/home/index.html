@@ -1,0 +1,22 @@
+[[define "title"]]QuizMaker[[end]]
+
+[[define "body"]]
+
+
+The quiz here
+<img src="data:image/png;base64,[[ .QRCodePNG ]]" alt="QR Code">
+
+<ul>
+  <!--
+[[ with .Files ]]
+  [[ range . ]]
+  <li><a href="/activities/[[ . ]]">[[ . ]]</a></li>
+  [[ end ]]
+[[ end ]]
+</ul>
+[[ end ]]
+-->
+
+[[define "page-javascript"]]
+<script type="module" src="/assets/js/activitites/index.js"></script>
+[[ end ]]

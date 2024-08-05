@@ -1,17 +1,46 @@
 package main
 
 import (
-	"net/http"
+	"errors"
+	"fmt"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jimmykarily/quizmaker/internal/controllers"
+	"github.com/jimmykarily/quizmaker/internal/settings"
+	settingspkg "github.com/jimmykarily/quizmaker/internal/settings"
 )
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	router := gin.Default()
+
+	var err error
+	var settings settingspkg.Settings
+
+	if settings, err = getSettings(); err != nil {
+		fmt.Println("Invalid settings: %s", err.Error())
+		os.Exit(1)
+	}
+
+	controllers.Settings = settings
+
+	setupRoutes(router, controllers.GetRoutes())
+
+	router.Run()
+}
+
+func setupRoutes(e *gin.Engine, routes controllers.Routes) {
+	e.Static("/assets", "./assets")
+	for _, r := range routes {
+		e.Handle(r.Method, r.Path, r.Handler)
+	}
+}
+
+func getSettings() (settings.Settings, error) {
+	result := settings.Settings{}
+	if result.Host = os.Getenv("QUIZMAKER_HOST"); result.Host == "" {
+		return result, errors.New("QUIZMAKER_HOST must be set")
+	}
+
+	return result, nil
 }
