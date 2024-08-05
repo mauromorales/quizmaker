@@ -1,1 +1,21 @@
 questions:
+  - text: In Linux, what does the 'chmod' command do?
+    difficulty: 4
+    type: single-choice
+    right-answer: 2
+    answers:
+    - Changes the owner of a file
+    - Changes file permissions [x]
+    - Creates a new directory
+    - Lists the contents of a directory
+
+  - text: Which of the following is NOT a Kubernetes component?
+    difficulty: 6
+    type: single-choice
+    right-answer: 3
+    answers:
+    - kubelet
+    - kube-proxy
+    - kube-router [x]
+    - kube-apiserver
+

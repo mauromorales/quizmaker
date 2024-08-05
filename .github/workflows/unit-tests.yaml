@@ -1,0 +1,30 @@
+name: Unit tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+env:
+  FORCE_COLOR: 1
+concurrency:
+  group: ci-unit-${{ github.head_ref || github.ref }}-${{ github.repository }}
+  cancel-in-progress: true
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run tests
+        run: |
+          go install github.com/onsi/ginkgo/v2/ginkgo
+          go get github.com/onsi/gomega/...
+          go run github.com/onsi/ginkgo/v2/ginkgo internal/models
+      - name: Codecov
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          file: ./coverage.out
