@@ -6,22 +6,16 @@ import (
 	"path"
 
 	"github.com/gin-gonic/gin"
-
-	qrcode "github.com/skip2/go-qrcode"
+	"github.com/skip2/go-qrcode"
 )
 
 type HomeController struct {
 }
 
-func (c *HomeController) Index(gctx *gin.Context) {
-	url, err := GetFullURL("QuizNew")
-	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
-		return
-	}
+var QuizNewQRImageMemoization []byte
 
-	var png []byte
-	// TODO: Memoize this url. It won't change at least until the app is restarted
-	png, err = qrcode.Encode(url, qrcode.Medium, 512)
+func (c *HomeController) Index(gctx *gin.Context) {
+	png, err := getQRCodePNG()
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
 	}
@@ -33,4 +27,26 @@ func (c *HomeController) Index(gctx *gin.Context) {
 	}
 
 	Render([]string{"main_layout", path.Join("home", "index")}, gctx.Writer, result)
+}
+
+func getQRCodePNG() ([]byte, error) {
+	if len(QuizNewQRImageMemoization) > 0 {
+		Settings.InfoLogger.Println("Using memoized QR code")
+		return QuizNewQRImageMemoization, nil
+	}
+
+	var png []byte
+
+	url, err := GetFullURL("QuizNew")
+	if err != nil {
+		return png, err
+	}
+
+	if png, err = qrcode.Encode(url, qrcode.Medium, 512); err != nil {
+		return png, err
+	}
+
+	QuizNewQRImageMemoization = png
+
+	return png, nil
 }

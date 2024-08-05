@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -41,6 +42,10 @@ func getSettings() (settings.Settings, error) {
 	if result.Host = os.Getenv("QUIZMAKER_HOST"); result.Host == "" {
 		return result, errors.New("QUIZMAKER_HOST must be set")
 	}
+
+	result.InfoLogger = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	result.WarningLogger = log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
+	result.ErrorLogger = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 
 	return result, nil
 }

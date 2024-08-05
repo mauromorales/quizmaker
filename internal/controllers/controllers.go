@@ -52,6 +52,7 @@ func Render(templates []string, w http.ResponseWriter, data interface{}) {
 // Write the error to the response writer and return  true if there was an error
 func handleError(w http.ResponseWriter, err error, code int) bool {
 	if err != nil {
+		Settings.ErrorLogger.Println(err.Error())
 		http.Error(w, err.Error(), code)
 		return true
 	}
