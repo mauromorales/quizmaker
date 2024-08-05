@@ -20,6 +20,7 @@ func (c *HomeController) Index(gctx *gin.Context) {
 	}
 
 	var png []byte
+	// TODO: Memoize this url. It won't change at least until the app is restarted
 	png, err = qrcode.Encode(url, qrcode.Medium, 512)
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
