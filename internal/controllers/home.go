@@ -15,7 +15,7 @@ type HomeController struct {
 var QuizNewQRImageMemoization []byte
 
 func (c *HomeController) Index(gctx *gin.Context) {
-	png, err := getQRCodePNG()
+	png, err := getQRCodePNG(gctx.Request.Host)
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
 	}
@@ -29,7 +29,7 @@ func (c *HomeController) Index(gctx *gin.Context) {
 	Render([]string{"main_layout", path.Join("home", "index")}, gctx.Writer, result)
 }
 
-func getQRCodePNG() ([]byte, error) {
+func getQRCodePNG(host string) ([]byte, error) {
 	if len(QuizNewQRImageMemoization) > 0 {
 		Settings.InfoLogger.Println("Using memoized QR code")
 		return QuizNewQRImageMemoization, nil
@@ -37,7 +37,7 @@ func getQRCodePNG() ([]byte, error) {
 
 	var png []byte
 
-	url, err := GetFullURL("QuizNew")
+	url, err := GetFullURL(host, "QuizNew")
 	if err != nil {
 		return png, err
 	}

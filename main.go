@@ -1,14 +1,12 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jimmykarily/quizmaker/internal/controllers"
-	"github.com/jimmykarily/quizmaker/internal/settings"
 	settingspkg "github.com/jimmykarily/quizmaker/internal/settings"
 )
 
@@ -19,7 +17,7 @@ func main() {
 	var settings settingspkg.Settings
 
 	if settings, err = getSettings(); err != nil {
-		fmt.Println("Invalid settings: %s", err.Error())
+		fmt.Printf("Invalid settings: %s", err.Error())
 		os.Exit(1)
 	}
 
@@ -37,15 +35,12 @@ func setupRoutes(e *gin.Engine, routes controllers.Routes) {
 	}
 }
 
-func getSettings() (settings.Settings, error) {
-	result := settings.Settings{}
-	if result.Host = os.Getenv("QUIZMAKER_HOST"); result.Host == "" {
-		return result, errors.New("QUIZMAKER_HOST must be set")
+func getSettings() (settingspkg.Settings, error) {
+	result := settingspkg.Settings{
+		InfoLogger:    log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile),
+		WarningLogger: log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile),
+		ErrorLogger:   log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile),
 	}
-
-	result.InfoLogger = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-	result.WarningLogger = log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
-	result.ErrorLogger = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 
 	return result, nil
 }

@@ -39,8 +39,8 @@ func GetRoutes() Routes {
 	return routes
 }
 
-func GetFullURL(routeName string) (string, error) {
-	u, err := url.Parse(Settings.Host)
+func GetFullURL(host, routeName string) (string, error) {
+	u, err := url.Parse(host)
 	if err != nil {
 		return "", fmt.Errorf("parsing host: %w", err)
 	}
