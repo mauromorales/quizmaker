@@ -1,7 +1,9 @@
 package models
 
 import (
+	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -17,8 +19,21 @@ type Question struct {
 	Answers     []string     `yaml:"answers,omitempty"`
 }
 
+type QuestionList []Question
+
 type QuestionPool struct {
-	Questions []Question `yaml:"questions,omitempty"`
+	Questions QuestionList `yaml:"questions,omitempty"`
+}
+
+type QuizOptions struct {
+	TotalQuestions     int
+	MinDifficulty      int
+	MaxDifficulty      int
+	QuestionTimeoutSec int
+}
+
+type Quiz struct {
+	Questions QuestionList `yaml:"questions,omitempty"`
 }
 
 func NewQuestionPoolFromFile(filePath string) (QuestionPool, error) {
@@ -36,6 +51,51 @@ func NewQuestionPool(template string) (QuestionPool, error) {
 	if err := yaml.Unmarshal([]byte(template), &result); err != nil {
 		return result, fmt.Errorf("unmarshaling template: %w", err)
 	}
+
+	return result, nil
+}
+
+func (ql QuestionList) InDifficultyRange(min, max int) QuestionList {
+	result := QuestionList{}
+	for _, q := range ql {
+		if q.Difficulty <= max && q.Difficulty >= min {
+			result = append(result, q)
+		}
+	}
+
+	return result
+}
+
+func (ql QuestionList) Suffled() QuestionList {
+	dest := make(QuestionList, len(ql))
+	perm := rand.Perm(len(ql))
+	for i, v := range perm {
+		dest[v] = ql[i]
+	}
+
+	return dest
+}
+
+func (ql QuestionList) Limit(limit int) QuestionList {
+	if len(ql) > limit {
+		return ql[0:limit]
+	}
+
+	return ql
+}
+
+func (qp QuestionPool) GenerateQuiz(opts QuizOptions) (Quiz, error) {
+	result := Quiz{}
+
+	result.Questions = qp.Questions.
+		InDifficultyRange(opts.MinDifficulty, opts.MaxDifficulty).
+		Suffled()
+
+	if opts.TotalQuestions > len(result.Questions) {
+		return result, errors.New("not enough questions")
+	}
+
+	result.Questions = result.Questions.Limit(opts.TotalQuestions)
 
 	return result, nil
 }

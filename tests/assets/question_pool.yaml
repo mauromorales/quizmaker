@@ -1,21 +1,200 @@
 questions:
-  - text: In Linux, what does the 'chmod' command do?
-    difficulty: 4
-    type: single-choice
-    right-answer: 2
-    answers:
-    - Changes the owner of a file
-    - Changes file permissions [x]
-    - Creates a new directory
-    - Lists the contents of a directory
-
-  - text: Which of the following is NOT a Kubernetes component?
-    difficulty: 6
+  - text: Question with difficulty 1
+    difficulty: 1
     type: single-choice
     right-answer: 3
     answers:
-    - kubelet
-    - kube-proxy
-    - kube-router [x]
-    - kube-apiserver
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
 
+  - text: Question 2 with difficulty 1
+    difficulty: 1
+    type: single-choice
+    right-answer: 3
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question with difficulty 2
+    difficulty: 2
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question 2 with difficulty 2
+    difficulty: 2
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question with difficulty 3
+    difficulty: 3
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question 2 with difficulty 3
+    difficulty: 3
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question with difficulty 4
+    difficulty: 4
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question 2 with difficulty 4
+    difficulty: 4
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question with difficulty 5
+    difficulty: 5
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question 2 with difficulty 5
+    difficulty: 5
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question with difficulty 6
+    difficulty: 6
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question 2 with difficulty 6
+    difficulty: 6
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question with difficulty 7
+    difficulty: 7
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question 2 with difficulty 7
+    difficulty: 7
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question with difficulty 8
+    difficulty: 8
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question 2 with difficulty 8
+    difficulty: 8
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question with difficulty 9
+    difficulty: 9
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question 2 with difficulty 9
+    difficulty: 9
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question with difficulty 10
+    difficulty: 10
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
+
+  - text: Question 2 with difficulty 10
+    difficulty: 10
+    type: single-choice
+    right-answer: 1
+    answers:
+    - answer 1
+    - answer 2
+    - answer 3
+    - answer 4
