@@ -17,21 +17,21 @@ type Question struct {
 	Answers     []string     `yaml:"answers,omitempty"`
 }
 
-type QuizTemplate struct {
+type QuestionPool struct {
 	Questions []Question `yaml:"questions,omitempty"`
 }
 
-func NewQuizTemplateFromFile(filePath string) (QuizTemplate, error) {
+func NewQuestionPoolFromFile(filePath string) (QuestionPool, error) {
 	b, err := os.ReadFile(filePath)
 	if err != nil {
-		return QuizTemplate{}, fmt.Errorf("reading file %s: %w", filePath, err)
+		return QuestionPool{}, fmt.Errorf("reading file %s: %w", filePath, err)
 	}
 
-	return NewQuizTemplate(string(b))
+	return NewQuestionPool(string(b))
 }
 
-func NewQuizTemplate(template string) (QuizTemplate, error) {
-	result := QuizTemplate{}
+func NewQuestionPool(template string) (QuestionPool, error) {
+	result := QuestionPool{}
 
 	if err := yaml.Unmarshal([]byte(template), &result); err != nil {
 		return result, fmt.Errorf("unmarshaling template: %w", err)

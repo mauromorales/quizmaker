@@ -6,16 +6,16 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("QuizTemplate", func() {
-	Describe("NewQuizTemplateFromFile", func() {
+var _ = Describe("QuestionPool", func() {
+	Describe("NewQuestionPoolFromFile", func() {
 		var templatePath string
 
 		BeforeEach(func() {
-			templatePath = "../../tests/assets/quiz_template.yaml"
+			templatePath = "../../tests/assets/question_pool.yaml"
 		})
 
-		It("returns a new QuizTemplate", func() {
-			t, err := NewQuizTemplateFromFile(templatePath)
+		It("returns a new QuestionPool", func() {
+			t, err := NewQuestionPoolFromFile(templatePath)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(t.Questions)).To(Equal(2))
 		})
