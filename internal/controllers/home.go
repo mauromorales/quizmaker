@@ -14,8 +14,13 @@ type HomeController struct {
 }
 
 func (c *HomeController) Index(gctx *gin.Context) {
+	url, err := GetFullURL("QuizNew")
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
+	}
+
 	var png []byte
-	png, err := qrcode.Encode(Settings.Host, qrcode.Medium, 256)
+	png, err = qrcode.Encode(url, qrcode.Medium, 512)
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
 	}
