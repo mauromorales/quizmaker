@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 
 	"github.com/gin-gonic/gin"
@@ -39,13 +40,15 @@ func GetRoutes() Routes {
 	return routes
 }
 
-func GetFullURL(host, routeName string) (string, error) {
-	u, err := url.Parse(host)
-	if err != nil {
-		return "", fmt.Errorf("parsing host: %w", err)
+func GetFullURL(request *http.Request, routeName string) (string, error) {
+	u := url.URL{Host: request.Host}
+
+	if request.TLS != nil {
+		u.Scheme = "https"
+	} else {
+		u.Scheme = "http"
 	}
 
-	u.Path = ""
 	for _, r := range GetRoutes() {
 		if r.Name == routeName {
 			u.Path = r.Path
