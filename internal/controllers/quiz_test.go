@@ -59,8 +59,8 @@ var _ = Describe("QuizController test", func() {
 			router.ServeHTTP(w, req)
 
 			Expect(w.Code).To(Equal(http.StatusOK), w.Body.String())
-			Expect(w.Body.String()).To(MatchRegexp("form action="))
-			Expect(w.Body.String()).To(MatchRegexp("Email:"))
+			Expect(w.Body.String()).To(MatchRegexp("form.*action="))
+			Expect(w.Body.String()).To(MatchRegexp("Start Quiz"))
 		})
 	})
 
