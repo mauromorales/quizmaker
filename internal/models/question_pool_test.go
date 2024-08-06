@@ -23,7 +23,7 @@ var _ = Describe("QuestionPool", func() {
 		})
 	})
 
-	Describe("#QuestionsInDifficultyRange", func() {
+	Describe("#InDifficultyRange", func() {
 		var pool QuestionPool
 		var err error
 
@@ -88,4 +88,63 @@ var _ = Describe("QuestionPool", func() {
 			})
 		})
 	})
+
+	Describe("#Limit", func() {
+		var questionPool string
+
+		BeforeEach(func() {
+			questionPool = `
+questions:
+  - text: Q1D1
+    difficulty: 1
+
+  - text: Q2D1
+    difficulty: 1
+
+  - text: Q1D2
+    difficulty: 2
+
+  - text: Q1D3
+    difficulty: 3
+
+  - text: Q2D3
+    difficulty: 3
+`
+		})
+
+		It("returns the requested number of questions", func() {
+			pool, err := NewQuestionPool(questionPool)
+			Expect(err).ToNot(HaveOccurred())
+			ql := pool.Questions.Limit(2)
+			questions := questionTextFromQuestionList(ql)
+			Expect(questions).To(HaveExactElements("Q1D1", "Q1D2"))
+
+			pool, err = NewQuestionPool(questionPool)
+			Expect(err).ToNot(HaveOccurred())
+			ql = pool.Questions.Limit(3)
+			questions = questionTextFromQuestionList(ql)
+			Expect(questions).To(HaveExactElements("Q1D1", "Q1D2", "Q1D3"))
+
+			pool, err = NewQuestionPool(questionPool)
+			Expect(err).ToNot(HaveOccurred())
+			ql = pool.Questions.Limit(4)
+			questions = questionTextFromQuestionList(ql)
+			Expect(questions).To(HaveExactElements("Q1D1", "Q1D2", "Q1D3", "Q2D1"))
+
+			pool, err = NewQuestionPool(questionPool)
+			Expect(err).ToNot(HaveOccurred())
+			ql = pool.Questions.Limit(5)
+			questions = questionTextFromQuestionList(ql)
+			Expect(questions).To(HaveExactElements("Q1D1", "Q1D2", "Q1D3", "Q2D1", "Q2D3"))
+		})
+	})
 })
+
+func questionTextFromQuestionList(ql QuestionList) []string {
+	result := []string{}
+	for _, q := range ql {
+		result = append(result, q.Text)
+	}
+
+	return result
+}

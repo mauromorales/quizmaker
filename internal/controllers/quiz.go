@@ -34,7 +34,7 @@ func (c *QuizController) Create(gctx *gin.Context) {
 
 	// TODO: Don't hardcode
 	q, err := qp.GenerateQuiz(models.QuizOptions{
-		TotalQuestions:     10,
+		TotalQuestions:     15,
 		MinDifficulty:      1,
 		MaxDifficulty:      10,
 		QuestionTimeoutSec: 10,
