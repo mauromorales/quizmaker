@@ -32,17 +32,9 @@ func main() {
 	}
 
 	controllers.Settings = settings
-
-	setupRoutes(router, controllers.GetRoutes())
+	controllers.SetupRoutes(router, controllers.GetRoutes())
 
 	router.Run()
-}
-
-func setupRoutes(e *gin.Engine, routes controllers.Routes) {
-	e.Static("/assets", "./assets")
-	for _, r := range routes {
-		e.Handle(r.Method, r.Path, r.Handler)
-	}
 }
 
 func getSettings() (settingspkg.Settings, error) {

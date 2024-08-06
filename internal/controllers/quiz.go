@@ -10,6 +10,7 @@ type QuizController struct {
 }
 
 func (c *QuizController) Create(gctx *gin.Context) {
-	// TODO: Generate a new quiz and redirect to the view page
+	// qp := NewQuestionPoolFromFile("")
+	// // TODO: Generate a new quiz and redirect to the view page
 	Render([]string{"main_layout", path.Join("quizzes", "show")}, gctx.Writer, nil)
 }

@@ -40,6 +40,15 @@ func GetRoutes() Routes {
 	return routes
 }
 
+func RouteByName(name string) (Route, error) {
+	for _, r := range GetRoutes() {
+		if r.Name == name {
+			return r, nil
+		}
+	}
+	return Route{}, fmt.Errorf("route %s not found", name)
+}
+
 func GetFullURL(request *http.Request, routeName string) (string, error) {
 	u := url.URL{Host: request.Host}
 
@@ -49,10 +58,8 @@ func GetFullURL(request *http.Request, routeName string) (string, error) {
 		u.Scheme = "http"
 	}
 
-	for _, r := range GetRoutes() {
-		if r.Name == routeName {
-			u.Path = r.Path
-		}
+	if r, err := RouteByName(routeName); err == nil {
+		u.Path = r.Path
 	}
 
 	if u.Path == "" {

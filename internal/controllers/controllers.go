@@ -6,6 +6,7 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/gin-gonic/gin"
 	settingspkg "github.com/jimmykarily/quizmaker/internal/settings"
 )
 
@@ -49,10 +50,19 @@ func Render(templates []string, w http.ResponseWriter, data interface{}) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func SetupRoutes(e *gin.Engine, routes Routes) {
+	e.Static("/assets", "./assets")
+	for _, r := range routes {
+		e.Handle(r.Method, r.Path, r.Handler)
+	}
+}
+
 // Write the error to the response writer and return  true if there was an error
 func handleError(w http.ResponseWriter, err error, code int) bool {
 	if err != nil {
-		Settings.ErrorLogger.Println(err.Error())
+		if Settings.ErrorLogger != nil { // we don't set it in tests
+			Settings.ErrorLogger.Println(err.Error())
+		}
 		http.Error(w, err.Error(), code)
 		return true
 	}
