@@ -1,9 +1,12 @@
 [[define "title"]]Quiz[[end]]
 
 [[define "body"]]
+[[ with .Quiz.Questions ]]
+  [[ range . ]]
+  <p>[[ .Text ]]</p>
+  [[ end ]]
+[[ end ]]
 
-
-The quiz questions here
 [[end]]
 
 [[define "page-javascript"]]
