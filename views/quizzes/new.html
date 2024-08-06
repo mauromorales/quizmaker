@@ -1,11 +1,19 @@
 [[define "title"]]New Quiz[[end]]
 
 [[define "body"]]
-<form action="[[ .SubmitURL ]]" method="post">
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
-    <button type="submit">Start Quiz</button>
+<div class="flex justify-center">
+<form class="space-y-4 w-full max-w-sm" action="[[ .SubmitURL ]]" method="post">
+    <div class="flex items-center border-b border-teal-500 py-2">
+    <input class="appearance-none bg-transparent border-none w-full mr-3 py-1 px-2 leading-tight focus:outline-none" type="email" id="email" name="email" required placeholder="Your e-mail" aria-label="Email">
+    <button class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
+        Start Quiz
+    </button>
+    </div>
+    <p class="text-sm text-gray-400 mt-4">
+    Your email is required to contact you about your prize if you win the quiz. We respect your privacy and will not share your email with third parties.
+    </p>
 </form>
+</div>
 [[end]]
 
 [[define "page-javascript"]]

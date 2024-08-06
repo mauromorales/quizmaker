@@ -12,12 +12,17 @@
     <!-- https://tailwindcss.com/docs/installation/play-cdn -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-  <header class="">
-  </header>
-  <main class="">
-  [[template "body" .]]
-  </main>
+  <body class="bg-gray-900 text-white flex justify-center min-h-screen">
+  <div class="w-full lg:w-1/2 p-4">
+    <header class="mb-8 text-center">
+      <img src="/assets/images/logo.png" alt="Logo" class="mx-auto w-80">
+    </header>
+    <main class="space-y-4">
+      <div class="bg-gray-800 p-4 rounded shadow-md">
+      [[template "body" .]]
+      </div>
+    </main>
+  </div>
 
   [[template "page-javascript" .]]
   </body>

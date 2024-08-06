@@ -1,12 +1,28 @@
 [[define "title"]]Quiz[[end]]
 
 [[define "body"]]
-[[ with .Quiz.Questions ]]
-  [[ range . ]]
-  <p>[[ .Text ]]</p>
-  [[ end ]]
-[[ end ]]
 
+<div class="bg-gray-800 p-8">
+  <div class="flex flex-col items-center space-y-6">
+    [[ $q := index .Quiz.Questions 0 ]]
+    <h2 class="text-2xl font-bold mb-4 text-center">[[ $q.Text ]]</h2>
+
+    <!-- Answer Options -->
+    <div class="space-y-4 w-full">
+      [[ range $q.Answers ]]
+        <label class="flex items-center p-4 border border-gray-600 rounded cursor-pointer hover:bg-gray-700 transition-colors">
+          <input type="radio" name="answer" value="Paris" class="form-checkbox text-teal-500 mr-4">
+          <span class="text-lg">[[ . ]]</span>
+        </label>
+      [[ end ]]
+    </div>
+
+    <!-- Next Button -->
+    <button class="bg-teal-500 hover:bg-teal-700 text-white py-3 px-6 text-lg rounded focus:outline-none focus:ring focus:ring-teal-500">
+      Next
+    </button>
+  </div>
+</div>
 [[end]]
 
 [[define "page-javascript"]]
