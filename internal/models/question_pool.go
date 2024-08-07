@@ -11,15 +11,6 @@ import (
 )
 
 type QuestionType string
-
-type Question struct {
-	Text        string       `yaml:"text,omitempty"`
-	Difficulty  int          `yaml:"difficulty,omitempty"`
-	Type        QuestionType `yaml:"type,omitempty"`
-	RightAnswer int          `yaml:"rightAnswer,omitempty"`
-	Answers     []string     `yaml:"answers,omitempty"`
-}
-
 type QuestionList []Question
 
 type QuestionPool struct {

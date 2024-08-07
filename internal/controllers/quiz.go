@@ -78,7 +78,7 @@ func ensureQuizSession(ctx *gin.Context) error {
 
 	cookie, err := ctx.Request.Cookie(COOKIE_NAME)
 	if err != nil { // no cookie found
-		_, err := sessionForEmail(submittedEmail)
+		_, err := models.SessionForEmail(Settings.DB, submittedEmail)
 		if err == nil {
 			return errors.New("email has already been used previously")
 		}
@@ -100,7 +100,7 @@ func ensureQuizSession(ctx *gin.Context) error {
 	}
 
 	// valid cookie with email. Let's lookup the session.
-	_, err = sessionForEmail(cookieValue["email"])
+	_, err = models.SessionForEmail(Settings.DB, cookieValue["email"])
 	// User has a valid cookie but we can't find a session.
 	// Create a new one (we probably deleted the session from db).
 	if err != nil {
@@ -124,16 +124,6 @@ func validTimestamp(timestampStr string) error {
 	}
 
 	return nil
-}
-
-func sessionForEmail(email string) (models.Session, error) {
-	var session models.Session
-	db := Settings.DB.First(&session, "email = ?", email) // SQL injection protected?
-	if err := db.Error; err != nil {
-		return session, err
-	}
-
-	return session, nil
 }
 
 func newSessionForEmail(ctx *gin.Context, email string) (models.Session, error) {

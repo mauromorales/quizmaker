@@ -29,6 +29,16 @@ func NewSessionForEmail(db *gorm.DB, email string) (Session, error) {
 	return session, nil
 }
 
+func SessionForEmail(db *gorm.DB, email string) (Session, error) {
+	var session Session
+	result := db.First(&session, "email = ?", email) // SQL injection protected?
+	if err := result.Error; err != nil {
+		return session, err
+	}
+
+	return session, nil
+}
+
 func ValidEmail(email string) bool {
 	return emailRegex.MatchString(email)
 }
