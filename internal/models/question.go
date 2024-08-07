@@ -10,7 +10,10 @@ import (
 )
 
 // https://raaaaaaaay86.medium.com/how-to-store-plain-string-slice-by-using-gorm-f855602013e6
-type Answers []string
+type (
+	Answers      []string
+	QuestionType string
+)
 
 type Question struct {
 	gorm.Model
@@ -24,6 +27,8 @@ type Question struct {
 }
 
 // Scan scan value into Jsonb, implements sql.Scanner interface
+// https://raaaaaaaay86.medium.com/how-to-store-plain-string-slice-by-using-gorm-f855602013e6
+// https://gorm.io/docs/data_types.html
 func (a *Answers) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
@@ -37,6 +42,8 @@ func (a *Answers) Scan(value interface{}) error {
 }
 
 // Value return json value, implement driver.Valuer interface
+// https://raaaaaaaay86.medium.com/how-to-store-plain-string-slice-by-using-gorm-f855602013e6
+// https://gorm.io/docs/data_types.html
 func (a Answers) Value() (driver.Value, error) {
 	if len(a) == 0 {
 		return nil, nil

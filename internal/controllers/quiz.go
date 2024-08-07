@@ -48,11 +48,12 @@ func (c *QuizController) Create(gctx *gin.Context) {
 	}
 
 	// TODO: Don't hardcode
-	q, err := qp.GenerateQuiz(models.QuizOptions{
+	q, err := models.NewQuizWithOpts(models.QuizOptions{
 		TotalQuestions:     15,
 		MinDifficulty:      1,
 		MaxDifficulty:      10,
 		QuestionTimeoutSec: 10,
+		Questions:          qp.Questions,
 	})
 
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
