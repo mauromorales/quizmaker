@@ -7,6 +7,10 @@ import (
 	"gorm.io/gorm"
 )
 
+// Rendering web pages might take some time.
+// Add some "slack" to the allowed seconds to cover for that.
+const ALLOWED_SECONDS_SLACK = 2
+
 type Session struct {
 	gorm.Model
 	Email     string
@@ -42,4 +46,19 @@ func SessionForEmail(db *gorm.DB, email string) (Session, error) {
 
 func ValidEmail(email string) bool {
 	return emailRegex.MatchString(email)
+}
+
+// HasExpiredQuestions returns `true` if there is at least one expired Question
+func (s Session) HasExpiredQuestions() bool {
+	for _, q := range s.Questions {
+		if q.Expired() {
+			return true
+		}
+	}
+	return false
+}
+
+// CurrentQuestion returns the first non-completed question
+func (s Session) CurrentQuestion() Question {
+	return Question{} // TODO
 }
