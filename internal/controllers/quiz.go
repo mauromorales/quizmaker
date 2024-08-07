@@ -155,19 +155,20 @@ func newSessionForEmail(ctx *gin.Context, email string) (models.Session, error) 
 		"timestamp": currentTimestamp,
 		"userAgent": userAgent,
 	}
-	if encoded, err := sc.Encode(COOKIE_NAME, value); err == nil {
-		cookie := &http.Cookie{
-			Name:     COOKIE_NAME,
-			Value:    encoded,
-			Path:     "/",
-			Expires:  time.Now().Add(COOKIE_LIFETIME_SEC * time.Second),
-			HttpOnly: true,
-		}
 
-		http.SetCookie(ctx.Writer, cookie)
-	} else {
-		return result, errors.New("failed to set cookie")
+	encoded, err := sc.Encode(COOKIE_NAME, value)
+	if err != nil {
+		return result, fmt.Errorf("failed to encode cookie: %w", err)
 	}
+
+	cookie := &http.Cookie{
+		Name:     COOKIE_NAME,
+		Value:    encoded,
+		Path:     "/",
+		Expires:  time.Now().Add(COOKIE_LIFETIME_SEC * time.Second),
+		HttpOnly: true,
+	}
+	http.SetCookie(ctx.Writer, cookie)
 
 	return result, nil
 }

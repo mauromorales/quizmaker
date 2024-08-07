@@ -35,7 +35,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := autoMigrate(settings.DB); err != nil {
+	if err := models.AutoMigrate(settings.DB); err != nil {
 		fmt.Printf("cannot migrate database: %s\n", err.Error())
 		os.Exit(1)
 	}
@@ -93,8 +93,4 @@ func getSettings() (settingspkg.Settings, error) {
 	}
 
 	return result, nil
-}
-
-func autoMigrate(db *gorm.DB) error {
-	return db.AutoMigrate(&models.Session{})
 }
