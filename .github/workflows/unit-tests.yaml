@@ -17,11 +17,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Run tests
+      - name: Install tools
         run: |
           go install github.com/onsi/ginkgo/v2/ginkgo
           go get github.com/onsi/gomega/...
+      - name: Model tests
+        run: |
           go run github.com/onsi/ginkgo/v2/ginkgo internal/models
+      - name: Controller tests
+        run: |
+          go run github.com/onsi/ginkgo/v2/ginkgo internal/controllers
       - name: Codecov
         uses: codecov/codecov-action@v4
         env:
