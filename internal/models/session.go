@@ -9,7 +9,8 @@ import (
 
 type Session struct {
 	gorm.Model
-	Email string
+	Email     string
+	Questions []Question `gorm:"foreignKey:SessionEmail;references:Email"`
 }
 
 var emailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
