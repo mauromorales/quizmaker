@@ -12,7 +12,7 @@ type QuizOptions struct {
 	MinDifficulty      int
 	MaxDifficulty      int
 	QuestionTimeoutSec int
-	Questions          QuestionList
+	AvailableQuestions QuestionList
 }
 
 // Quiz is the collection of questions from a QuestionPool based on QuizOptions.
@@ -25,7 +25,7 @@ type Quiz struct {
 func NewQuizWithOpts(opts QuizOptions) (Quiz, error) {
 	result := Quiz{}
 
-	result.Questions = opts.Questions.InDifficultyRange(opts.MinDifficulty, opts.MaxDifficulty)
+	result.Questions = opts.AvailableQuestions.InDifficultyRange(opts.MinDifficulty, opts.MaxDifficulty)
 
 	if opts.TotalQuestions > len(result.Questions) {
 		return result, errors.New("not enough questions")

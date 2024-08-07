@@ -32,7 +32,7 @@ func NewSessionForEmail(db *gorm.DB, email string) (Session, error) {
 
 func SessionForEmail(db *gorm.DB, email string) (Session, error) {
 	var session Session
-	result := db.First(&session, "email = ?", email) // SQL injection protected?
+	result := db.First(&session, "email = ?", email)
 	if err := result.Error; err != nil {
 		return session, err
 	}

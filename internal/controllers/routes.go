@@ -42,6 +42,13 @@ func GetRoutes() Routes {
 			Format:  "html",
 			Handler: (&QuizController{}).Create,
 		},
+		Route{
+			Name:    "QuizShow",
+			Method:  "GET",
+			Path:    "/quiz",
+			Format:  "html",
+			Handler: (&QuizController{}).Show,
+		},
 	}
 
 	return routes

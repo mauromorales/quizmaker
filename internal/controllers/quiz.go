@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/securecookie"
 	"github.com/jimmykarily/quizmaker/internal/models"
+	"gorm.io/gorm/clause"
 )
 
 const (
@@ -18,8 +19,14 @@ const (
 	COOKIE_TIMESTAMP_FORMAT = "2006-01-02 15:04:05"
 )
 
-type QuizController struct {
-}
+type (
+	QuizController struct{}
+	CookieValue    struct {
+		Email     string
+		Timestamp string
+		UserAgent string
+	}
+)
 
 func (c *QuizController) New(gctx *gin.Context) {
 	submitURL, err := GetFullURL(gctx.Request, "QuizCreate")
@@ -36,8 +43,37 @@ func (c *QuizController) New(gctx *gin.Context) {
 	Render([]string{"main_layout", path.Join("quizzes", "new")}, gctx.Writer, viewData)
 }
 
+func (c *QuizController) Show(gctx *gin.Context) {
+	currentSession, err := currentSession(gctx)
+	if handleError(gctx.Writer, err, http.StatusBadRequest) {
+		return
+	}
+
+	err = Settings.DB.Preload(clause.Associations).Find(&currentSession).Error
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
+	}
+
+	// TODO:
+	// - If there are "started" questions that are now expired, return an error
+	// - Find the next unanswered question here
+	currentQuestion := currentSession.Questions[0]
+
+	viewData := struct{ Question models.Question }{
+		Question: currentQuestion,
+	}
+
+	Render([]string{"main_layout", path.Join("quizzes", "show")}, gctx.Writer, viewData)
+}
+
 func (c *QuizController) Create(gctx *gin.Context) {
-	err := ensureQuizSession(gctx)
+	submittedEmail := gctx.Request.FormValue("email")
+	if !models.ValidEmail(submittedEmail) {
+		handleError(gctx.Writer, errors.New("invalid email"), http.StatusBadRequest)
+		return
+	}
+
+	session, err := ensureQuizSession(gctx)
 	if handleError(gctx.Writer, err, http.StatusBadRequest) {
 		return
 	}
@@ -53,65 +89,88 @@ func (c *QuizController) Create(gctx *gin.Context) {
 		MinDifficulty:      1,
 		MaxDifficulty:      10,
 		QuestionTimeoutSec: 10,
-		Questions:          qp.Questions,
+		AvailableQuestions: qp.Questions,
 	})
 
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
 	}
 
-	viewData := struct {
-		Quiz models.Quiz
-	}{
-		Quiz: q,
+	err = q.PersistForSessionEmail(Settings.DB, session.Email)
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
 	}
 
-	Render([]string{"main_layout", path.Join("quizzes", "show")}, gctx.Writer, viewData)
+	redirectURL, err := GetFullURL(gctx.Request, "QuizShow")
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
+	}
+
+	gctx.Redirect(http.StatusFound, redirectURL)
 }
 
-func ensureQuizSession(ctx *gin.Context) error {
-	sc := securecookie.New([]byte(Settings.CookieSecret), nil)
+func validCookieValue(ctx *gin.Context) (CookieValue, error) {
+	var result CookieValue
 
-	submittedEmail := ctx.Request.FormValue("email")
-	if !models.ValidEmail(submittedEmail) {
-		return errors.New("invalid email")
-	}
+	sc := securecookie.New([]byte(Settings.CookieSecret), nil)
 
 	cookie, err := ctx.Request.Cookie(COOKIE_NAME)
 	if err != nil { // no cookie found
-		_, err := models.SessionForEmail(Settings.DB, submittedEmail)
+		return result, err
+	}
+
+	if err = sc.Decode(COOKIE_NAME, cookie.Value, &result); err != nil {
+		return result, fmt.Errorf("invalid cookie format: %w", err)
+	}
+
+	if err := validTimestamp(result.Timestamp); err != nil {
+		return result, fmt.Errorf("invalid timestamp: %w", err)
+	}
+
+	return result, nil
+}
+
+func currentSession(ctx *gin.Context) (models.Session, error) {
+	cookieValue, err := validCookieValue(ctx)
+	if err != nil {
+		return models.Session{}, err
+	}
+
+	session, err := models.SessionForEmail(Settings.DB, cookieValue.Email)
+	if err != nil {
+		return session, fmt.Errorf("finding user session: %w", err)
+	}
+
+	return session, nil
+}
+
+func ensureQuizSession(ctx *gin.Context) (models.Session, error) {
+	var session models.Session
+
+	submittedEmail := ctx.Request.FormValue("email")
+
+	cookieValue, err := validCookieValue(ctx)
+	if errors.Is(err, http.ErrNoCookie) { // no cookie found
+		session, err = models.SessionForEmail(Settings.DB, submittedEmail)
 		if err == nil {
-			return errors.New("email has already been used previously")
+			return session, errors.New("email has already been used previously")
 		}
 
-		_, err = newSessionForEmail(ctx, submittedEmail) // fresh email
-		if err != nil {
-			return fmt.Errorf("creating a new session: %w", err)
-		}
-		return nil
+		return newSessionForEmail(ctx, submittedEmail) // fresh email
 	}
-
-	cookieValue := make(map[string]string)
-	if err = sc.Decode(COOKIE_NAME, cookie.Value, &cookieValue); err != nil {
-		return fmt.Errorf("invalid cookie format: %w", err)
-	}
-
-	if err := validTimestamp(cookieValue["timestamp"]); err != nil {
-		return fmt.Errorf("invalid timestamp: %w", err)
+	if err != nil { // other errors (expired or invalid cookie)
+		return session, err
 	}
 
 	// valid cookie with email. Let's lookup the session.
-	_, err = models.SessionForEmail(Settings.DB, cookieValue["email"])
+	session, err = models.SessionForEmail(Settings.DB, cookieValue.Email)
 	// User has a valid cookie but we can't find a session.
 	// Create a new one (we probably deleted the session from db).
 	if err != nil {
-		_, err = newSessionForEmail(ctx, cookieValue["email"])
-		if err != nil {
-			return err
-		}
+		return newSessionForEmail(ctx, cookieValue.Email)
 	}
 
-	return nil
+	return session, nil
 }
 
 func validTimestamp(timestampStr string) error {
@@ -141,10 +200,10 @@ func newSessionForEmail(ctx *gin.Context, email string) (models.Session, error) 
 	// create the cookie too
 	userAgent := ctx.Request.UserAgent()
 	currentTimestamp := time.Now().Format(COOKIE_TIMESTAMP_FORMAT)
-	value := map[string]string{
-		"email":     email,
-		"timestamp": currentTimestamp,
-		"userAgent": userAgent,
+	value := CookieValue{
+		Email:     email,
+		Timestamp: currentTimestamp,
+		UserAgent: userAgent,
 	}
 
 	encoded, err := sc.Encode(COOKIE_NAME, value)

@@ -20,7 +20,7 @@ var _ = Describe("Quiz", func() {
 			MinDifficulty:      2,
 			MaxDifficulty:      4,
 			QuestionTimeoutSec: 10,
-			Questions:          pool.Questions,
+			AvailableQuestions: pool.Questions,
 		}
 	})
 
