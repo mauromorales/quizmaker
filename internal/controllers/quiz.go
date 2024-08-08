@@ -54,10 +54,15 @@ func (c *QuizController) Show(gctx *gin.Context) {
 		return
 	}
 
-	// TODO:
-	// - If there are "started" questions that are now expired, return an error
-	// - Find the next unanswered question here
-	currentQuestion := currentSession.Questions[0]
+	currentQuestion, err := currentSession.CurrentQuestion()
+	// TODO: Return a flash error (when flashes are implemented)
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
+	}
+	if currentQuestion.ID == 0 {
+		// TODO: Quiz is finished, show an flash alert
+		return
+	}
 
 	viewData := struct{ Question models.Question }{
 		Question: currentQuestion,
