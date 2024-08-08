@@ -15,7 +15,7 @@ type HomeController struct {
 var QuizNewQRImageMemoization map[string][]byte
 
 func (c *HomeController) Index(gctx *gin.Context) {
-	NewQuizURL, err := GetFullURL(gctx.Request, "QuizNew")
+	NewQuizURL, err := GetFullURL(gctx.Request, "QuizNew", nil)
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
 	}

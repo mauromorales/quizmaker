@@ -6,20 +6,22 @@
   <div class="flex flex-col items-center space-y-6">
     <h2 class="text-2xl font-bold mb-4 text-center">[[ .Question.Text ]]</h2>
 
+    <form action="[[ .SubmitURL ]]" method="post">
     <!-- Answer Options -->
     <div class="space-y-4 w-full">
-      [[ range .Question.Answers ]]
+      [[ range $i, $a := .Question.Answers ]]
         <label class="flex items-center p-4 border border-gray-600 rounded cursor-pointer hover:bg-gray-700 transition-colors">
-          <input type="radio" name="answer" value="Paris" class="form-checkbox text-teal-500 mr-4">
+          <input type="radio" name="answer" value="[[ add $i 1 ]]" class="form-checkbox text-teal-500 mr-4">
           <span class="text-lg">[[ . ]]</span>
         </label>
       [[ end ]]
     </div>
 
     <!-- Next Button -->
-    <button class="bg-teal-500 hover:bg-teal-700 text-white py-3 px-6 text-lg rounded focus:outline-none focus:ring focus:ring-teal-500">
+    <button type="submit" class="bg-teal-500 hover:bg-teal-700 text-white py-3 px-6 text-lg rounded focus:outline-none focus:ring focus:ring-teal-500">
       Next
     </button>
+    </form>
   </div>
 </div>
 [[end]]

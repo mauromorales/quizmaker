@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,6 +50,13 @@ func GetRoutes() Routes {
 			Format:  "html",
 			Handler: (&QuizController{}).Show,
 		},
+		Route{
+			Name:    "QuestionAnswer",
+			Method:  "POST",
+			Path:    "/questions/:id",
+			Format:  "html",
+			Handler: (&QuestionController{}).Answer,
+		},
 	}
 
 	return routes
@@ -63,7 +71,7 @@ func RouteByName(name string) (Route, error) {
 	return Route{}, fmt.Errorf("route %s not found", name)
 }
 
-func GetFullURL(request *http.Request, routeName string) (string, error) {
+func GetFullURL(request *http.Request, routeName string, params map[string]string) (string, error) {
 	u := url.URL{Host: request.Host}
 
 	if request.TLS != nil {
@@ -78,6 +86,13 @@ func GetFullURL(request *http.Request, routeName string) (string, error) {
 
 	if u.Path == "" {
 		return "", fmt.Errorf("no route %s found", routeName)
+	}
+
+	// Replace path parameters
+	for key, value := range params {
+		// Escape path parameters
+		encodedValue := url.PathEscape(value)
+		u.Path = strings.ReplaceAll(u.Path, ":"+key, encodedValue)
 	}
 
 	return u.String(), nil

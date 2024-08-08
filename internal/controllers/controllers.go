@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"text/template"
+	templatepkg "text/template"
 
 	"github.com/gin-gonic/gin"
 	settingspkg "github.com/jimmykarily/quizmaker/internal/settings"
@@ -21,7 +21,7 @@ func Render(templates []string, w http.ResponseWriter, data interface{}) {
 		tmplContent []byte
 	)
 
-	tmpl := template.New("page_template")
+	tmpl := templatepkg.New("page_template")
 	tmpl = tmpl.Delims("[[", "]]")
 	for _, template := range templates {
 		tmplFile, err = os.Open("views/" + template + ".html")
@@ -33,10 +33,11 @@ func Render(templates []string, w http.ResponseWriter, data interface{}) {
 			break
 		}
 
-		tmpl, err = tmpl.Parse(string(tmplContent))
-		if err != nil {
-			break
-		}
+		tmpl = templatepkg.Must(tmpl.Funcs(templatepkg.FuncMap{
+			"add": func(a, b int) int {
+				return a + b
+			},
+		}).Parse(string(tmplContent)))
 	}
 
 	if handleError(w, err, 500) {

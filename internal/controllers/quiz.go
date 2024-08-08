@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +30,7 @@ type (
 )
 
 func (c *QuizController) New(gctx *gin.Context) {
-	submitURL, err := GetFullURL(gctx.Request, "QuizCreate")
+	submitURL, err := GetFullURL(gctx.Request, "QuizCreate", nil)
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
 	}
@@ -64,14 +65,28 @@ func (c *QuizController) Show(gctx *gin.Context) {
 		return
 	}
 
-	viewData := struct{ Question models.Question }{
-		Question: currentQuestion,
+	questionID := strconv.Itoa(int(currentQuestion.ID))
+	submitURL, err := GetFullURL(gctx.Request, "QuestionAnswer", map[string]string{"id": questionID})
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
+	}
+	viewData := struct {
+		Question  models.Question
+		SubmitURL string
+	}{
+		Question:  currentQuestion,
+		SubmitURL: submitURL,
 	}
 
 	Render([]string{"main_layout", path.Join("quizzes", "show")}, gctx.Writer, viewData)
 }
 
 func (c *QuizController) Create(gctx *gin.Context) {
+	err := gctx.Request.ParseForm()
+	if handleError(gctx.Writer, err, http.StatusBadRequest) {
+		return
+	}
+
 	submittedEmail := gctx.Request.FormValue("email")
 	if !models.ValidEmail(submittedEmail) {
 		handleError(gctx.Writer, errors.New("invalid email"), http.StatusBadRequest)
@@ -80,6 +95,21 @@ func (c *QuizController) Create(gctx *gin.Context) {
 
 	session, err := ensureQuizSession(gctx)
 	if handleError(gctx.Writer, err, http.StatusBadRequest) {
+		return
+	}
+
+	redirectURL, err := GetFullURL(gctx.Request, "QuizShow", nil)
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
+	}
+
+	// Reload the session with Questions
+	err = Settings.DB.Preload(clause.Associations).Find(&session).Error
+	if handleError(gctx.Writer, err, http.StatusBadRequest) {
+		return
+	}
+	if len(session.Questions) > 0 { // Pre-existing session, just redirect to quiz
+		gctx.Redirect(http.StatusFound, redirectURL)
 		return
 	}
 
@@ -102,11 +132,6 @@ func (c *QuizController) Create(gctx *gin.Context) {
 	}
 
 	err = q.PersistForSessionEmail(Settings.DB, session.Email)
-	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
-		return
-	}
-
-	redirectURL, err := GetFullURL(gctx.Request, "QuizShow")
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
 	}
