@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"regexp"
+	"sort"
 
 	"gorm.io/gorm"
 )
@@ -58,7 +59,36 @@ func (s Session) HasExpiredQuestions() bool {
 	return false
 }
 
-// CurrentQuestion returns the first non-completed question
-func (s Session) CurrentQuestion() Question {
-	return Question{} // TODO
+// CurrentQuestion returns the first non-expired question
+// If the session has an expired question, this method returns an error
+// (there is no "CurrentQuestion" since the whole Session is expired)
+func (s Session) CurrentQuestion() (Question, error) {
+	if s.HasExpiredQuestions() {
+		return Question{}, errors.New("time is out, quiz is expired")
+	}
+
+	// sort by index
+	sort.Slice(s.Questions, func(i, j int) bool {
+		return s.Questions[i].Index < s.Questions[j].Index
+	})
+
+	// if there is an already started question, return that, no matter the Index
+	// otherwise it will expire will answering another one. This should not happen
+	// if the questions are presented in order of Index but this code handles this
+	// anyway.
+	for _, q := range s.Questions {
+		if !q.StartedAt.IsZero() && q.UserAnswer == 0 {
+			return q, nil
+		}
+	}
+
+	// return the first unanswered question by Index
+	for _, q := range s.Questions {
+		if q.UserAnswer == 0 {
+			return q, nil
+		}
+	}
+
+	// no unanswered question found
+	return Question{}, nil
 }
