@@ -155,7 +155,7 @@ func validCookieValue(ctx *gin.Context) (CookieValue, error) {
 
 	cookie, err := ctx.Request.Cookie(COOKIE_NAME)
 	if err != nil { // no cookie found
-		return result, err
+		return result, fmt.Errorf("finding the %s cookie: %w", COOKIE_NAME, err)
 	}
 
 	if err = sc.Decode(COOKIE_NAME, cookie.Value, &result); err != nil {

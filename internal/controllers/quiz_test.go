@@ -10,8 +10,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jimmykarily/quizmaker/internal/controllers"
+	"github.com/jimmykarily/quizmaker/internal/models"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"gorm.io/gorm/clause"
 )
 
 var _ = Describe("QuizController test", func() {
@@ -65,32 +67,81 @@ var _ = Describe("QuizController test", func() {
 	})
 
 	Describe("#Create", func() {
+		var email string
+		var session models.Session
+		var cookie *http.Cookie
+
 		BeforeEach(func() {
+			email = "john.doe@example.com"
+
 			route, err = controllers.RouteByName("QuizCreate")
 			Expect(err).ToNot(HaveOccurred())
+
+			w, cookie = performRequest(router, route, email, nil)
 		})
 
-		It("creates a new quiz", func() {
-			form := url.Values{}
-			form.Add("email", "john.doe@example.com")
-			encodedForm := form.Encode()
+		When("a quiz doesn't exist", func() {
+			It("creates a new quiz", func() {
+				err := controllers.Settings.DB.Preload(clause.Associations).First(&session).Error
+				Expect(err).ToNot(HaveOccurred())
 
-			req, err := http.NewRequest("POST", route.Path, strings.NewReader(encodedForm))
-			Expect(err).ToNot(HaveOccurred())
+				Expect(w.Body.String()).To(MatchRegexp("Question.*with difficulty"))
+				Expect(len(session.Questions)).To(Equal(15))
+			})
+		})
 
-			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		When("a quiz already exists", func() {
+			BeforeEach(func() {
+				err := controllers.Settings.DB.Preload(clause.Associations).First(&session).Error
+				Expect(err).ToNot(HaveOccurred())
 
-			router.ServeHTTP(w, req)
+				Expect(w.Body.String()).To(MatchRegexp("Question.*with difficulty"))
+				Expect(len(session.Questions)).To(Equal(15))
+			})
 
-			Expect(w.Code).To(Equal(http.StatusFound), w.Body.String())
+			It("doesn't create a new quiz", func() {
+				w, cookie = performRequest(router, route, email, cookie)
+				err := controllers.Settings.DB.Preload(clause.Associations).First(&session).Error
+				Expect(err).ToNot(HaveOccurred())
 
-			redirectURL := w.Result().Header["Location"]
-			req, err = http.NewRequest("GET", redirectURL[0], strings.NewReader(encodedForm))
-			req.AddCookie(w.Result().Cookies()[0])
-			Expect(err).ToNot(HaveOccurred())
-			router.ServeHTTP(w, req)
-
-			Expect(w.Body.String()).To(MatchRegexp("Question.*with difficulty"))
+				Expect(w.Body.String()).To(MatchRegexp("Question.*with difficulty"))
+				Expect(len(session.Questions)).To(Equal(15))
+			})
 		})
 	})
 })
+
+func performRequest(router *gin.Engine, route controllers.Route, email string, cookie *http.Cookie) (*httptest.ResponseRecorder, *http.Cookie) {
+	w := httptest.NewRecorder()
+	form := url.Values{}
+	form.Add("email", email)
+	encodedForm := form.Encode()
+
+	req, err := http.NewRequest("POST", route.Path, strings.NewReader(encodedForm))
+	Expect(err).ToNot(HaveOccurred())
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	if cookie != nil {
+		req.AddCookie(cookie)
+	}
+
+	router.ServeHTTP(w, req)
+	Expect(w.Code).To(Equal(http.StatusFound), w.Body.String())
+
+	var newCookie *http.Cookie
+	if cookies := w.Result().Cookies(); len(cookies) > 0 {
+		newCookie = w.Result().Cookies()[0]
+	}
+
+	redirectURL := w.Result().Header["Location"]
+	req, err = http.NewRequest("GET", redirectURL[0], strings.NewReader(encodedForm))
+	Expect(err).ToNot(HaveOccurred())
+	if newCookie == nil {
+		newCookie = cookie
+	}
+	req.AddCookie(newCookie)
+	router.ServeHTTP(w, req)
+
+	return w, newCookie
+}
