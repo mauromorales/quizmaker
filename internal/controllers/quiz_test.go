@@ -82,7 +82,14 @@ var _ = Describe("QuizController test", func() {
 
 			router.ServeHTTP(w, req)
 
-			Expect(w.Code).To(Equal(http.StatusOK), w.Body.String())
+			Expect(w.Code).To(Equal(http.StatusFound), w.Body.String())
+
+			redirectURL := w.Result().Header["Location"]
+			req, err = http.NewRequest("GET", redirectURL[0], strings.NewReader(encodedForm))
+			req.AddCookie(w.Result().Cookies()[0])
+			Expect(err).ToNot(HaveOccurred())
+			router.ServeHTTP(w, req)
+
 			Expect(w.Body.String()).To(MatchRegexp("Question.*with difficulty"))
 		})
 	})

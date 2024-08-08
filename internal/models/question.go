@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -17,13 +18,25 @@ type (
 
 type Question struct {
 	gorm.Model
-	SessionEmail string
-	Session      Session      `gorm:"foreignKey:SessionEmail"`
-	Text         string       `yaml:"text,omitempty"`
-	Difficulty   int          `yaml:"difficulty,omitempty"`
-	Type         QuestionType `yaml:"type,omitempty"`
-	RightAnswer  int          `yaml:"rightAnswer,omitempty"`
-	Answers      Answers      `yaml:"answers,omitempty" gorm:"type:VARCHAR(255)"`
+	Index          int // used for sorting in the final quiz
+	SessionEmail   string
+	Session        Session      `gorm:"foreignKey:SessionEmail"`
+	Text           string       `yaml:"text,omitempty"`
+	Difficulty     int          `yaml:"difficulty,omitempty"`
+	Type           QuestionType `yaml:"type,omitempty"`
+	RightAnswer    int          `yaml:"rightAnswer,omitempty"`
+	UserAnswer     int
+	Answers        Answers `yaml:"answers,omitempty" gorm:"type:VARCHAR(255)"`
+	AllowedSeconds int     `yaml:"allowedSeconds,omitempty"`
+	StartedAt      time.Time
+}
+
+func (q Question) Expired() bool {
+	isStarted := q.StartedAt.IsZero()
+	outOfTime := int(time.Since(q.StartedAt).Seconds()) > q.AllowedSeconds+ALLOWED_SECONDS_SLACK
+	notAnswered := (q.UserAnswer == 0)
+
+	return !isStarted && outOfTime && notAnswered
 }
 
 // Scan scan value into Jsonb, implements sql.Scanner interface

@@ -1,6 +1,8 @@
 package models_test
 
 import (
+	"slices"
+
 	. "github.com/jimmykarily/quizmaker/internal/models"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -74,6 +76,16 @@ var _ = Describe("Quiz", func() {
 		It("assigns the questions to the specified email/Session", func() {
 			Expect(db.Preload(clause.Associations).Find(&session).Error).ToNot(HaveOccurred())
 			Expect(len(session.Questions)).To(Equal(4))
+		})
+
+		It("adds a unique index to each question", func() {
+			Expect(db.Preload(clause.Associations).Find(&session).Error).ToNot(HaveOccurred())
+			indices := []int{}
+			for _, q := range session.Questions {
+				indices = append(indices, q.Index)
+			}
+			slices.Sort(indices)
+			Expect(indices).To(HaveExactElements(1, 2, 3, 4))
 		})
 	})
 })
