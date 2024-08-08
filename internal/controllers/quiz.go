@@ -163,6 +163,11 @@ func ensureQuizSession(ctx *gin.Context) (models.Session, error) {
 	}
 
 	// valid cookie with email. Let's lookup the session.
+	if cookieValue.Email != submittedEmail {
+		return session, fmt.Errorf("already started with email: %s", cookieValue.Email)
+	}
+
+	// valid cookie with email. Let's lookup the session.
 	session, err = models.SessionForEmail(Settings.DB, cookieValue.Email)
 	// User has a valid cookie but we can't find a session.
 	// Create a new one (we probably deleted the session from db).
