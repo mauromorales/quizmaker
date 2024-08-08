@@ -18,6 +18,7 @@ type (
 
 type Question struct {
 	gorm.Model
+	Index          int // used for sorting in the final quiz
 	SessionEmail   string
 	Session        Session      `gorm:"foreignKey:SessionEmail"`
 	Text           string       `yaml:"text,omitempty"`

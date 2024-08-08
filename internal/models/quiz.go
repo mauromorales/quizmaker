@@ -41,6 +41,9 @@ func (quiz Quiz) PersistForSessionEmail(db *gorm.DB, email string) error {
 	if err != nil {
 		return fmt.Errorf("looking up session for email %s: %w", email, err)
 	}
+	for i := range quiz.Questions {
+		quiz.Questions[i].Index = i + 1
+	}
 
 	return db.Model(&s).Association("Questions").Append(quiz.Questions)
 }
