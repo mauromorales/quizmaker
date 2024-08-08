@@ -32,6 +32,9 @@ func NewQuizWithOpts(opts QuizOptions) (Quiz, error) {
 	}
 
 	result.Questions = result.Questions.Limit(opts.TotalQuestions).OrderedByDifficulty()
+	for i := range result.Questions {
+		result.Questions[i].AllowedSeconds = opts.QuestionTimeoutSec
+	}
 
 	return result, nil
 }

@@ -78,6 +78,15 @@ func (c *QuizController) Show(gctx *gin.Context) {
 		SubmitURL: submitURL,
 	}
 
+	// If it's the first time we show the question, make it "started"
+	if currentQuestion.StartedAt.IsZero() {
+		currentQuestion.StartedAt = time.Now()
+		err = Settings.DB.Save(&currentQuestion).Error
+		if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+			return
+		}
+	}
+
 	Render([]string{"main_layout", path.Join("quizzes", "show")}, gctx.Writer, viewData)
 }
 

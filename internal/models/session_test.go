@@ -76,22 +76,37 @@ var _ = Describe("Session", func() {
 						Text:           "started and expired question",
 						StartedAt:      time.Now().Add(-10 * time.Second),
 						AllowedSeconds: 5,
+						Index:          1,
 					},
 					{
 						Text:           "not started question",
 						AllowedSeconds: 5,
-					},
-					{
-						Text:           "started but not expired question",
-						StartedAt:      time.Now(),
-						AllowedSeconds: 1000000,
+						Index:          2,
 					},
 				}
 			})
+			When("there is a started question", func() {
+				BeforeEach(func() {
+					session.Questions = append(session.Questions, Question{
+						Text:           "started but not expired question",
+						StartedAt:      time.Now(),
+						AllowedSeconds: 1000000,
+						Index:          3,
+					})
+				})
+				It("returns the started question regardless of Index", func() {
+					q, err := session.CurrentQuestion()
+					Expect(err).ToNot(HaveOccurred())
+					Expect(q.Text).To(Equal("started but not expired question"))
+					Expect(q.Index).To(Equal(3))
+				})
+			})
 
-			It("returns an error", func() {
-				_, err := session.CurrentQuestion()
-				Expect(err).To(MatchError("time is out, quiz is expired"))
+			It("returns the next question", func() {
+				q, err := session.CurrentQuestion()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(q.Text).To(Equal("not started question"))
+				Expect(q.Index).To(Equal(2))
 			})
 		})
 		When("there are no expired questions", func() {
