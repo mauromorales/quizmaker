@@ -2,7 +2,7 @@ This is an application that builds quizzes. Can be used in conferences or other 
 
 It's still work in progress but already usable.
 
-![screenshot](https://github.com/jimmykarily/quizmaker/blob/master/images/screenshot.png?raw=true)
+![screenshot](images/screenshot.png)
 
 All you need it to create a yaml file with the possible questions (see the test
 file as an example: [test questions.yaml](tests/assets/question_pool.yaml))
