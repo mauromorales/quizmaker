@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -26,9 +26,6 @@ func (c *QuestionController) Answer(gctx *gin.Context) {
 
 	qid := gctx.Param("id")
 	selectedAnswer := gctx.Request.FormValue("answer")
-	// TODO: If the question doesn't belong to the current session, return an error
-	// TODO: When no answer is selected, flash an error and redirect to quiz again
-	fmt.Printf("session.ID = %+v\n", session.ID)
 
 	var question models.Question
 	err = Settings.DB.First(&question, "ID = ?", qid).Error
@@ -36,9 +33,9 @@ func (c *QuestionController) Answer(gctx *gin.Context) {
 		return
 	}
 
-	redirectURL, err := GetFullURL(gctx.Request, "QuizShow", nil)
-	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
-		return
+	// If the question doesn't belong to the current session
+	if question.SessionEmail != session.Email {
+		handleError(gctx.Writer, errors.New("question doesn't belong to session"), http.StatusUnauthorized)
 	}
 
 	// Don't allow answering expired or already answered questions
@@ -54,6 +51,11 @@ func (c *QuestionController) Answer(gctx *gin.Context) {
 		if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 			return
 		}
+	}
+
+	redirectURL, err := GetFullURL(gctx.Request, "QuizShow", nil)
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
 	}
 
 	gctx.Redirect(http.StatusFound, redirectURL)

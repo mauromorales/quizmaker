@@ -70,12 +70,44 @@ var _ = Describe("QuestionController test", func() {
 				session = models.Session{Email: email}
 				Expect(controllers.Settings.DB.Create(&session).Error).ToNot(HaveOccurred())
 			})
+			When("the question doesn't belong to the current session", func() {
+				BeforeEach(func() {
+					question = models.Question{
+						SessionEmail: "someonelse@example.com",
+						Text:         "some question",
+						StartedAt:    time.Now().Add(1 * time.Hour),
+					}
+					err = controllers.Settings.DB.Save(&question).Error
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				It("returns an HTTP Unauthorized", func() {
+					params := map[string]string{
+						"id":     strconv.Itoa(int(question.ID)),
+						"answer": "2",
+					}
+
+					path, err := controllers.GetRoutePath("QuestionAnswer",
+						map[string]string{"id": strconv.Itoa(int(question.ID))})
+					Expect(err).ToNot(HaveOccurred())
+
+					w, _ := performPostWithParams(router, "POST", path, params, cookie)
+					Expect(w.Code).To(Equal(http.StatusUnauthorized))
+
+					err = controllers.Settings.DB.Find(&question).Error
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(question.UserAnswer).To(Equal(2))
+
+				})
+			})
 
 			When("question is not expired and not answered", func() {
 				BeforeEach(func() {
 					question = models.Question{
-						Text:      "some question",
-						StartedAt: time.Now().Add(1 * time.Hour),
+						Text:         "some question",
+						StartedAt:    time.Now().Add(1 * time.Hour),
+						SessionEmail: session.Email,
 					}
 					err = controllers.Settings.DB.Save(&question).Error
 					Expect(err).ToNot(HaveOccurred())
