@@ -1,0 +1,49 @@
+[[define "title"]]Quiz Results[[end]]
+
+[[define "body"]]
+<div class="bg-gray-800 p-8 relative">
+  <!-- Container for Results Header and Score -->
+  <div class="flex flex-col items-center">
+    <h1 class="text-3xl font-bold mb-4 text-white">Quiz Results</h1>
+    <div class="bg-gray-700 text-white text-xl font-semibold px-6 py-3 rounded-lg shadow-lg">
+      Total Score: [[ .ScorePercentage ]]%
+    </div>
+  </div>
+
+  <!-- Results Container -->
+  <div class="space-y-6 mt-6">
+    [[ range $i, $q := .Session.Questions ]]
+      <div class="bg-gray-900 p-6 rounded-lg shadow-lg">
+        <h2 class="text-xl font-bold text-white mb-4">Question [[ add $i 1 ]]: [[ $q.Text ]]</h2>
+
+        <!-- User's Answer -->
+        <div class="mb-2">
+          <strong class="text-white">Your Answer:</strong>
+          [[ if ne $q.UserAnswer 0 ]]
+          [[ $aIdx := sub $q.UserAnswer 1 ]]
+          <p class="text-gray-400">[[ index $q.Answers $aIdx ]]</p>
+          [[ else ]]
+          <p class="text-gray-400">none</p>
+          [[ end ]]
+        </div>
+
+        <!-- Correct Answer -->
+        <div class="mb-2">
+          <strong class="text-green-400">Correct Answer:</strong>
+          [[ $idx := sub $q.RightAnswer 1 ]]
+          <p class="text-gray-400">[[ index $q.Answers $idx ]]</p>
+        </div>
+
+        <!-- Indicate Correct/Incorrect -->
+        <div class="mt-2">
+          [[ if eq $q.RightAnswer $q.UserAnswer ]]
+            <span class="text-green-500 font-semibold">Correct!</span>
+          [[ else ]]
+            <span class="text-red-500 font-semibold">Incorrect!</span>
+          [[ end ]]
+        </div>
+      </div>
+    [[ end ]]
+  </div>
+</div>
+[[end]]

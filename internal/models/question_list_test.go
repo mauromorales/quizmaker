@@ -15,6 +15,62 @@ var _ = Describe("QuestionList", func() {
 		poolPath = "../../tests/assets/question_pool.yaml"
 	})
 
+	Describe("#Valid", func() {
+		var list QuestionList
+
+		BeforeEach(func() {
+			pool, err := NewQuestionPool(`
+questions:
+  - text: Invalid Question (no "rightAnswer" set)
+    ID: 1
+    difficulty: 3
+    type: multiple-choice
+    answers:
+    - answer 1
+    - answer 2
+
+  - text: Invalid Question ("rightAnswer" set to non-existent index)
+    ID: 2
+    difficulty: 3
+    type: multiple-choice
+    rightAnswer: 10
+    answers:
+    - answer 1
+    - answer 2
+
+  - text: Valid question
+    ID: 3
+    difficulty: 1
+    type: boolean
+    rightAnswer: 2
+    answers:
+    - True
+    - False
+`)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(db.Save(&pool.Questions).Error).ToNot(HaveOccurred())
+			list = pool.Questions
+		})
+
+		It("returns only questions that are valid", func() {
+			// sanity check first
+			allIDs := map[int]int{}
+			for _, q := range list {
+				allIDs[int(q.ID)] = 1
+			}
+			Expect(maps.Keys(allIDs)).To(ConsistOf(1, 2, 3))
+
+			// filtered list now
+			questions := list.Valid()
+			ids := map[int]int{}
+			for _, q := range questions {
+				ids[int(q.ID)] = 1
+			}
+
+			Expect(maps.Keys(ids)).To(ConsistOf(3))
+		})
+	})
+
 	Describe("#InDifficultyRange", func() {
 		var list QuestionList
 

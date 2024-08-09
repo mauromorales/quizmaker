@@ -7,6 +7,18 @@ import (
 
 type QuestionList []Question
 
+func (ql QuestionList) Valid() QuestionList {
+	result := QuestionList{}
+	for _, q := range ql {
+		rightAnswerCorrectlySet := q.RightAnswer > 0 && q.RightAnswer <= len(q.Answers)
+		if rightAnswerCorrectlySet {
+			result = append(result, q)
+		}
+	}
+
+	return result
+}
+
 func (ql QuestionList) InDifficultyRange(min, max int) QuestionList {
 	result := QuestionList{}
 	for _, q := range ql {

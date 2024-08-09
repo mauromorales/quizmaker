@@ -59,8 +59,16 @@ func (c *QuizController) Show(gctx *gin.Context) {
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
 	}
+	// Quiz is finished, show the results page
 	if currentQuestion.ID == 0 {
-		// TODO: Quiz is finished, show an flash alert
+		viewData := struct {
+			Session         models.Session
+			ScorePercentage string
+		}{
+			Session:         currentSession,
+			ScorePercentage: "98", // TODO
+		}
+		Render([]string{"main_layout", path.Join("quizzes", "result")}, gctx.Writer, viewData)
 		return
 	}
 

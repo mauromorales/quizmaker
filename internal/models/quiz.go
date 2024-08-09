@@ -25,7 +25,7 @@ type Quiz struct {
 func NewQuizWithOpts(opts QuizOptions) (Quiz, error) {
 	result := Quiz{}
 
-	result.Questions = opts.AvailableQuestions.InDifficultyRange(opts.MinDifficulty, opts.MaxDifficulty)
+	result.Questions = opts.AvailableQuestions.Valid().InDifficultyRange(opts.MinDifficulty, opts.MaxDifficulty)
 
 	if opts.TotalQuestions > len(result.Questions) {
 		return result, errors.New("not enough questions")

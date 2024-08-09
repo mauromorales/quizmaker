@@ -41,6 +41,9 @@ func Render(templates []string, w http.ResponseWriter, data interface{}) {
 			"add": func(a, b int) int {
 				return a + b
 			},
+			"sub": func(a, b int) int {
+				return a - b
+			},
 		}).Parse(string(tmplContent)))
 	}
 
