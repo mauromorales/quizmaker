@@ -72,6 +72,7 @@ func RouteByName(name string) (Route, error) {
 }
 
 func GetFullURL(request *http.Request, routeName string, params map[string]string) (string, error) {
+	var err error
 	u := url.URL{Host: request.Host}
 
 	if request.TLS != nil {
@@ -80,20 +81,29 @@ func GetFullURL(request *http.Request, routeName string, params map[string]strin
 		u.Scheme = "http"
 	}
 
-	if r, err := RouteByName(routeName); err == nil {
-		u.Path = r.Path
+	if u.Path, err = GetRoutePath(routeName, params); err != nil {
+		return "", err
 	}
 
-	if u.Path == "" {
-		return "", fmt.Errorf("no route %s found", routeName)
+	return u.String(), nil
+}
+
+func GetRoutePath(routeName string, params map[string]string) (string, error) {
+	var path string
+	var err error
+	var route Route
+
+	if route, err = RouteByName(routeName); err != nil {
+		return "", err
 	}
+	path = route.Path
 
 	// Replace path parameters
 	for key, value := range params {
 		// Escape path parameters
 		encodedValue := url.PathEscape(value)
-		u.Path = strings.ReplaceAll(u.Path, ":"+key, encodedValue)
+		path = strings.ReplaceAll(path, ":"+key, encodedValue)
 	}
 
-	return u.String(), nil
+	return path, nil
 }

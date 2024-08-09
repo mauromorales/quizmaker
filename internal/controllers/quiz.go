@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/securecookie"
 	"github.com/jimmykarily/quizmaker/internal/models"
 	"gorm.io/gorm/clause"
 )
@@ -154,41 +153,6 @@ func (c *QuizController) Create(gctx *gin.Context) {
 	gctx.Redirect(http.StatusFound, redirectURL)
 }
 
-func validCookieValue(ctx *gin.Context) (CookieValue, error) {
-	var result CookieValue
-
-	sc := securecookie.New([]byte(Settings.CookieSecret), nil)
-
-	cookie, err := ctx.Request.Cookie(COOKIE_NAME)
-	if err != nil { // no cookie found
-		return result, fmt.Errorf("finding the %s cookie: %w", COOKIE_NAME, err)
-	}
-
-	if err = sc.Decode(COOKIE_NAME, cookie.Value, &result); err != nil {
-		return result, fmt.Errorf("invalid cookie format: %w", err)
-	}
-
-	if err := validTimestamp(result.Timestamp); err != nil {
-		return result, fmt.Errorf("invalid timestamp: %w", err)
-	}
-
-	return result, nil
-}
-
-func currentSession(ctx *gin.Context) (models.Session, error) {
-	cookieValue, err := validCookieValue(ctx)
-	if err != nil {
-		return models.Session{}, err
-	}
-
-	session, err := models.SessionForEmail(Settings.DB, cookieValue.Email)
-	if err != nil {
-		return session, fmt.Errorf("finding user session: %w", err)
-	}
-
-	return session, nil
-}
-
 func ensureQuizSession(ctx *gin.Context) (models.Session, error) {
 	var session models.Session
 
@@ -240,33 +204,15 @@ func newSessionForEmail(ctx *gin.Context, email string) (models.Session, error) 
 	var err error
 	var result models.Session
 
-	sc := securecookie.New([]byte(Settings.CookieSecret), nil)
-
 	result, err = models.NewSessionForEmail(Settings.DB, email)
 	if err != nil {
 		return result, fmt.Errorf("creating a new session: %w", err)
 	}
 
 	// create the cookie too
-	userAgent := ctx.Request.UserAgent()
-	currentTimestamp := time.Now().Format(COOKIE_TIMESTAMP_FORMAT)
-	value := CookieValue{
-		Email:     email,
-		Timestamp: currentTimestamp,
-		UserAgent: userAgent,
-	}
-
-	encoded, err := sc.Encode(COOKIE_NAME, value)
+	cookie, err := CreateCookie(email, ctx.Request.UserAgent())
 	if err != nil {
-		return result, fmt.Errorf("failed to encode cookie: %w", err)
-	}
-
-	cookie := &http.Cookie{
-		Name:     COOKIE_NAME,
-		Value:    encoded,
-		Path:     "/",
-		Expires:  time.Now().Add(COOKIE_LIFETIME_SEC * time.Second),
-		HttpOnly: true,
+		return result, fmt.Errorf("creating the cookie: %w", err)
 	}
 	http.SetCookie(ctx.Writer, cookie)
 
