@@ -3,7 +3,6 @@ package controllers_test
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -72,7 +71,6 @@ func generateSecret() (string, error) {
 }
 
 func performPostWithParams(router *gin.Engine, verb, path string, params map[string]string, cookie *http.Cookie) (*httptest.ResponseRecorder, *http.Cookie) {
-	fmt.Printf("cookie = %+v\n", cookie)
 	w := httptest.NewRecorder()
 	form := url.Values{}
 	for k, v := range params {

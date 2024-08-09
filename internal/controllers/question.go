@@ -26,7 +26,6 @@ func (c *QuestionController) Answer(gctx *gin.Context) {
 
 	qid := gctx.Param("id")
 	selectedAnswer := gctx.Request.FormValue("answer")
-	// TODO: if answer is empty for whatever reason, flash an error and redirect to quiz show
 	// TODO: If the question doesn't belong to the current session, return an error
 	// TODO: When no answer is selected, flash an error and redirect to quiz again
 	fmt.Printf("session.ID = %+v\n", session.ID)

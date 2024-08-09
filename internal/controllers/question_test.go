@@ -99,6 +99,27 @@ var _ = Describe("QuestionController test", func() {
 
 					Expect(question.UserAnswer).To(Equal(2))
 				})
+
+				When("the answer param is empty", func() {
+					It("returns an error", func() {
+						params := map[string]string{
+							"id":     strconv.Itoa(int(question.ID)),
+							"answer": "",
+						}
+
+						path, err := controllers.GetRoutePath("QuestionAnswer",
+							map[string]string{"id": strconv.Itoa(int(question.ID))})
+						Expect(err).ToNot(HaveOccurred())
+
+						w, _ := performPostWithParams(router, "POST", path, params, cookie)
+						Expect(w.Code).To(Equal(http.StatusBadRequest))
+
+						err = controllers.Settings.DB.Find(&question).Error
+						Expect(err).ToNot(HaveOccurred())
+
+						Expect(question.UserAnswer).To(Equal(0))
+					})
+				})
 			})
 		})
 	})
