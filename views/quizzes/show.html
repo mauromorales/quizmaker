@@ -23,7 +23,7 @@
       <div id="answers-container" class="space-y-4 w-full">
         [[ range $i, $a := .Question.Answers ]]
           <label class="flex items-center p-4 border border-gray-600 rounded cursor-pointer hover:bg-gray-700 transition-colors w-full">
-            <input type="radio" name="answer" value="[[ add $i 1 ]]" class="form-checkbox text-teal-500 mr-4">
+            <input type="radio" name="answer" value="[[ add $i 1 ]]" class="form-checkbox text-teal-500 mr-4" required>
             <span class="text-lg break-words w-full">[[ . ]]</span>
           </label>
         [[ end ]]
