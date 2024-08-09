@@ -144,6 +144,53 @@ questions:
 			Expect(questions).To(HaveExactElements("Q1D1", "Q1D2", "Q1D3", "Q2D1", "Q2D3"))
 		})
 	})
+
+	Describe("#Score", func() {
+		var list QuestionList
+
+		BeforeEach(func() {
+			questionPool := `
+questions:
+  - text: correctly answered 1
+    rightAnswer: 1
+    userAnswer: 1
+    answers:
+    - ans 1
+    - ans 2
+  - text: correctly answered 2
+    rightAnswer: 1
+    userAnswer: 1
+    answers:
+    - ans 1
+    - ans 2
+  - text: wrongly answered 1
+    rightAnswer: 3
+    userAnswer: 1
+    answers:
+    - ans 1
+    - ans 2
+    - ans 3
+  - text: missing answer 1
+    rightAnswer: 2
+    answers:
+    - ans 1
+    - ans 2
+  - text: invalid question 1
+    rightAnswer: 20
+    answers:
+    - ans 1
+    - ans 2
+`
+			pool, err := NewQuestionPool(questionPool)
+			Expect(err).ToNot(HaveOccurred())
+
+			list = pool.Questions
+		})
+
+		It("returns the score percentage counting missing answers as wrong and ignoring invalid ones", func() {
+			Expect(list.Score()).To(Equal(50.0))
+		})
+	})
 })
 
 func questionTextFromQuestionList(ql QuestionList) []string {

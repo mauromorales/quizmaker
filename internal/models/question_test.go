@@ -46,4 +46,20 @@ var _ = Describe("Question", func() {
 			Expect(question.Expired()).To(BeFalse())
 		})
 	})
+
+	Describe("#Valid", func() {
+		It("returns false when the RightAnswer set to a wrong index", func() {
+			question := Question{
+				Text:        "started, not anwswered and out of time question",
+				RightAnswer: 4,
+				Answers: Answers{
+					"answer1",
+					"answer2",
+				},
+			}
+			Expect(question.Valid()).To(BeFalse())
+			question.RightAnswer = 1
+			Expect(question.Valid()).To(BeTrue())
+		})
+	})
 })

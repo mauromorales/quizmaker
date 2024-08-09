@@ -25,9 +25,9 @@ type Question struct {
 	Difficulty     int          `yaml:"difficulty,omitempty"`
 	Type           QuestionType `yaml:"type,omitempty"`
 	RightAnswer    int          `yaml:"rightAnswer,omitempty"`
-	UserAnswer     int
-	Answers        Answers `yaml:"answers,omitempty" gorm:"type:VARCHAR(255)"`
-	AllowedSeconds int     `yaml:"allowedSeconds,omitempty"`
+	UserAnswer     int          `yaml:"userAnswer,omitempty"`
+	Answers        Answers      `yaml:"answers,omitempty" gorm:"type:VARCHAR(255)"`
+	AllowedSeconds int          `yaml:"allowedSeconds,omitempty"`
 	StartedAt      time.Time
 }
 
@@ -37,6 +37,12 @@ func (q Question) Expired() bool {
 	notAnswered := (q.UserAnswer == 0)
 
 	return !isStarted && outOfTime && notAnswered
+}
+
+func (q Question) Valid() bool {
+	rightAnswerCorrectlySet := q.RightAnswer > 0 && q.RightAnswer <= len(q.Answers)
+
+	return rightAnswerCorrectlySet
 }
 
 // Scan scan value into Jsonb, implements sql.Scanner interface

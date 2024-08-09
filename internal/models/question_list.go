@@ -10,8 +10,7 @@ type QuestionList []Question
 func (ql QuestionList) Valid() QuestionList {
 	result := QuestionList{}
 	for _, q := range ql {
-		rightAnswerCorrectlySet := q.RightAnswer > 0 && q.RightAnswer <= len(q.Answers)
-		if rightAnswerCorrectlySet {
+		if q.Valid() {
 			result = append(result, q)
 		}
 	}
@@ -103,4 +102,24 @@ func (ql QuestionList) Limit(limit int) QuestionList {
 	}
 
 	return result
+}
+
+func (ql QuestionList) Score() float64 {
+	totalQuestions := 0
+	correctAnswers := 0
+	for _, q := range ql {
+		if !q.Valid() {
+			continue // Invalid questions don't count in score
+		}
+		totalQuestions++
+		if q.UserAnswer != 0 && q.UserAnswer == q.RightAnswer {
+			correctAnswers++
+		}
+	}
+
+	if totalQuestions == 0 { // All questions invalid?
+		return 0.0
+	}
+
+	return (float64(correctAnswers) / float64(totalQuestions)) * 100
 }

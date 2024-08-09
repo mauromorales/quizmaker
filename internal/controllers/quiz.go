@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"path"
 	"strconv"
@@ -59,6 +60,9 @@ func (c *QuizController) Show(gctx *gin.Context) {
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
 	}
+
+	score := int(math.Round(models.QuestionList(currentSession.Questions).Score()))
+
 	// Quiz is finished, show the results page
 	if currentQuestion.ID == 0 {
 		viewData := struct {
@@ -66,7 +70,7 @@ func (c *QuizController) Show(gctx *gin.Context) {
 			ScorePercentage string
 		}{
 			Session:         currentSession,
-			ScorePercentage: "98", // TODO
+			ScorePercentage: strconv.Itoa(score),
 		}
 		Render([]string{"main_layout", path.Join("quizzes", "result")}, gctx.Writer, viewData)
 		return
