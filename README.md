@@ -23,7 +23,11 @@ NOTE: This application started as part of the [Kairos.io](https://kairos.io/) te
 
 TODO:
 
-- improve the README
+- Finalize the question pool
 - make it configurable so other teams can use their own logo and text
 - create an easy way to collect results
+- Create a container image with the compiled application
 - create an easy deployment method (kustomization / helm chart / other)
+- Test in Kairos kiosk mode and create the relevant helper files
+- Create endpoint that shows the currently active quizzes
+- improve the README
