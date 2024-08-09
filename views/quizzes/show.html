@@ -1,13 +1,26 @@
 [[define "title"]]Quiz[[end]]
 
 [[define "body"]]
-<div class="bg-gray-800 p-8">
-  <div class="space-y-6">
-    <h2 class="text-2xl font-bold mb-4 break-words w-full">[[ .Question.Text ]]</h2>
+<div class="bg-gray-800 p-8 relative">
+  <!-- Container for Timer and Question Text -->
+  <div class="flex items-start justify-between">
+    <!-- Question Text -->
+    <div class="ml-6 flex-1">
+      <h2 class="text-2xl font-bold mb-4 break-words w-full">[[ .Question.Text ]]</h2>
+    </div>
 
+    <!-- Countdown Timer -->
+    <div id="timer" class="bg-gray-700 text-white text-3xl font-semibold px-4 py-2 rounded-lg shadow-lg">
+      Time Left: <span id="time-value"></span>
+    </div>
+
+  </div>
+
+
+  <div class="space-y-6 mt-4">
     <form action="[[ .SubmitURL ]]" method="post" class="w-full">
       <!-- Answer Options -->
-      <div class="space-y-4 w-full">
+      <div id="answers-container" class="space-y-4 w-full">
         [[ range $i, $a := .Question.Answers ]]
           <label class="flex items-center p-4 border border-gray-600 rounded cursor-pointer hover:bg-gray-700 transition-colors w-full">
             <input type="radio" name="answer" value="[[ add $i 1 ]]" class="form-checkbox text-teal-500 mr-4">
@@ -16,13 +29,62 @@
         [[ end ]]
       </div>
 
-      <button type="submit" class="bg-teal-500 hover:bg-teal-700 text-white py-3 px-6 text-lg rounded focus:outline-none focus:ring focus:ring-teal-500 mt-6 w-full">
-        Next
-      </button>
+      <div class="flex space-x-4 mt-4">
+        <button id="submit-button" type="submit" class="bg-teal-500 hover:bg-teal-700 text-white py-3 px-6 text-lg rounded focus:outline-none focus:ring focus:ring-teal-500">
+          Submit
+        </button>
+        
+        <!-- Next Question Button -->
+        <a id="next-question-button" href="#" class="hidden bg-blue-500 hover:bg-blue-700 text-white py-3 px-6 text-lg rounded focus:outline-none focus:ring focus:ring-blue-500">
+          Next Question
+        </a>
+      </div>
     </form>
   </div>
 </div>
 [[end]]
 
 [[define "page-javascript"]]
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set the initial seconds from the Go template variable
+    var seconds = [[ .TimeLeft ]];
+
+    // Get the timer element, the submit button, and the next question button
+    var timeValueElement = document.getElementById("time-value");
+    var submitButton = document.getElementById("submit-button");
+    var nextQuestionButton = document.getElementById("next-question-button");
+
+    // Set the href attribute of the Next Question button to the current page URL
+    nextQuestionButton.href = window.location.href;
+
+    // Update the timer display every second
+    var countdownInterval = setInterval(function() {
+      if (seconds > 0) {
+        timeValueElement.textContent = seconds + "s";
+        seconds--;
+      } else {
+        clearInterval(countdownInterval); // Stop the interval
+        timeValueElement.textContent = "Time's up!";
+
+        // Disable all radio buttons
+        var radios = document.querySelectorAll('#answers-container input[type="radio"]');
+        radios.forEach(function(radio) {
+          radio.disabled = true;
+          radio.parentElement.classList.add("opacity-50", "cursor-not-allowed"); // Visually indicate disabled
+        });
+
+        // Disable the submit button and show the next question button
+        submitButton.disabled = true;
+        submitButton.classList.add("opacity-50", "cursor-not-allowed");
+        nextQuestionButton.classList.remove("hidden");
+      }
+    }, 1000);
+
+    // Display the initial time immediately
+    timeValueElement.textContent = seconds + "s";
+  });
+</script>
+
+
 [[ end ]]

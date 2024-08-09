@@ -70,13 +70,6 @@ func (c *QuizController) Show(gctx *gin.Context) {
 	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 		return
 	}
-	viewData := struct {
-		Question  models.Question
-		SubmitURL string
-	}{
-		Question:  currentQuestion,
-		SubmitURL: submitURL,
-	}
 
 	// If it's the first time we show the question, make it "started"
 	if currentQuestion.StartedAt.IsZero() {
@@ -85,6 +78,19 @@ func (c *QuizController) Show(gctx *gin.Context) {
 		if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 			return
 		}
+	}
+
+	endTime := currentQuestion.StartedAt.Add(
+		time.Duration(currentQuestion.AllowedSeconds) * time.Second)
+	timeLeft := int(time.Until(endTime).Seconds())
+	viewData := struct {
+		Question  models.Question
+		SubmitURL string
+		TimeLeft  int
+	}{
+		Question:  currentQuestion,
+		SubmitURL: submitURL,
+		TimeLeft:  int(timeLeft),
 	}
 
 	Render([]string{"main_layout", path.Join("quizzes", "show")}, gctx.Writer, viewData)
@@ -132,7 +138,7 @@ func (c *QuizController) Create(gctx *gin.Context) {
 		TotalQuestions:     15,
 		MinDifficulty:      1,
 		MaxDifficulty:      10,
-		QuestionTimeoutSec: 10,
+		QuestionTimeoutSec: 30,
 		AvailableQuestions: qp.Questions,
 	})
 

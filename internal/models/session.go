@@ -8,10 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Rendering web pages might take some time.
-// Add some "slack" to the allowed seconds to cover for that.
-const ALLOWED_SECONDS_SLACK = 2
-
 type Session struct {
 	gorm.Model
 	Email     string
