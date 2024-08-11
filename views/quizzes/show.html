@@ -2,20 +2,25 @@
 
 [[define "body"]]
 <div class="bg-gray-800 p-8 relative">
-  <!-- Container for Timer and Question Text -->
+  <div class="flex items-center justify-between mb-6 border-b border-gray-600 pb-4">
+    <!-- Current Position -->
+    <div class="text-white text-xl font-semibold">
+      Question [[ .CurrentQuestion ]] / [[ .TotalQuestions ]]
+    </div>
+
+    <!-- Countdown Timer -->
+    <div id="timer" class="bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow-lg">
+      Time Left: <span id="time-value"></span>
+    </div>
+  </div>
+
+  <!-- Container for Question Text -->
   <div class="flex items-start justify-between">
     <!-- Question Text -->
     <div class="ml-6 flex-1">
       <h2 class="text-2xl font-bold mb-4 break-words w-full">[[ .Question.Text ]]</h2>
     </div>
-
-    <!-- Countdown Timer -->
-    <div id="timer" class="bg-gray-700 text-white text-3xl font-semibold px-4 py-2 rounded-lg shadow-lg">
-      Time Left: <span id="time-value"></span>
-    </div>
-
   </div>
-
 
   <div class="space-y-6 mt-4">
     <form action="[[ .SubmitURL ]]" method="post" class="w-full">
@@ -85,6 +90,4 @@
     timeValueElement.textContent = seconds + "s";
   });
 </script>
-
-
-[[ end ]]
+[[end]]

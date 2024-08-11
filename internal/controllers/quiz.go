@@ -95,13 +95,17 @@ func (c *QuizController) Show(gctx *gin.Context) {
 		time.Duration(currentQuestion.AllowedSeconds) * time.Second)
 	timeLeft := int(time.Until(endTime).Seconds())
 	viewData := struct {
-		Question  models.Question
-		SubmitURL string
-		TimeLeft  int
+		Question        models.Question
+		SubmitURL       string
+		TimeLeft        int
+		CurrentQuestion int
+		TotalQuestions  int
 	}{
-		Question:  currentQuestion,
-		SubmitURL: submitURL,
-		TimeLeft:  int(timeLeft),
+		Question:        currentQuestion,
+		SubmitURL:       submitURL,
+		TimeLeft:        int(timeLeft),
+		CurrentQuestion: currentQuestion.Index,
+		TotalQuestions:  len(currentSession.Questions),
 	}
 
 	Render([]string{"main_layout", path.Join("quizzes", "show")}, gctx.Writer, viewData)
