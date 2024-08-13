@@ -2,8 +2,10 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"sort"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -17,8 +19,8 @@ type Session struct {
 
 var emailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
 
-func NewSessionForEmail(db *gorm.DB, email string) (Session, error) {
-	session := Session{Email: email}
+func NewSession(db *gorm.DB, email, nickname string) (Session, error) {
+	session := Session{Email: email, Nickname: nickname}
 
 	if !ValidEmail(email) {
 		return session, errors.New("invalid email")
@@ -84,4 +86,48 @@ func (s Session) CurrentQuestion() (Question, error) {
 
 	// no unanswered question found
 	return Question{}, nil
+}
+
+func (s Session) Score() int {
+	return 55
+}
+
+// EmailObfuscated obfuscates an email address by replacing characters with dots,
+// except for the first and last characters of the username and domain parts.
+func (s Session) EmailObfuscated() string {
+	parts := strings.Split(s.Email, "@")
+	if len(parts) != 2 {
+		return s.Email // Return the original email if it's invalid
+	}
+
+	obfuscatedUsername := obfuscateString(parts[0])
+	obfuscatedDomain := obfuscateDomain(parts[1])
+	fmt.Printf("obfuscatedDomain = %+v\n", obfuscatedDomain)
+	fmt.Printf("obfuscatedUsername = %+v\n", obfuscatedUsername)
+
+	return obfuscatedUsername + "@" + obfuscatedDomain
+}
+
+func obfuscateString(part string) string {
+	if len(part) <= 2 {
+		return part // Do not obfuscate if the part is too short
+	}
+
+	// Keep the first and last characters, replace the rest with dots
+	return string(part[0]) + strings.Repeat(".", len(part)-2) + string(part[len(part)-1])
+}
+
+// obfuscateDomain obfuscates the domain part of the email while preserving the TLD.
+func obfuscateDomain(domain string) string {
+	domainParts := strings.Split(domain, ".")
+	if len(domainParts) < 2 {
+		return obfuscateString(domain) // If the domain is not well-formed, treat it as a simple part
+	}
+
+	// Obfuscate everything except the last part (the TLD)
+	for i := 0; i < len(domainParts)-1; i++ {
+		domainParts[i] = obfuscateString(domainParts[i])
+	}
+
+	return strings.Join(domainParts, ".")
 }
