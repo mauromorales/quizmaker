@@ -11,6 +11,7 @@ import (
 type Session struct {
 	gorm.Model
 	Email     string
+	Nickname  string
 	Questions []Question `gorm:"foreignKey:SessionEmail;references:Email"`
 }
 
