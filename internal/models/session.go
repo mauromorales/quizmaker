@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"regexp"
 	"sort"
@@ -134,8 +133,6 @@ func (s Session) EmailObfuscated() string {
 
 	obfuscatedUsername := obfuscateString(parts[0])
 	obfuscatedDomain := obfuscateDomain(parts[1])
-	fmt.Printf("obfuscatedDomain = %+v\n", obfuscatedDomain)
-	fmt.Printf("obfuscatedUsername = %+v\n", obfuscatedUsername)
 
 	return obfuscatedUsername + "@" + obfuscatedDomain
 }
