@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"net/http"
 	"path"
+	"sort"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jimmykarily/quizmaker/internal/models"
@@ -13,17 +15,30 @@ type (
 
 func (c *SessionController) List(gctx *gin.Context) {
 	sessions := []models.Session{}
-	Settings.DB.Model(&models.Session{}).Select("sessions.*, count(questions.ID) as questions").
-		Joins("left join questions on questions.session_email = sessions.email").
-		Group("sessions.email").
-		Scan(&sessions)
+	err := Settings.DB.Find(&sessions).Error
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
+	}
+
+	var complete, inProgress []models.Session
+	for _, s := range sessions {
+		if s.Complete {
+			complete = append(complete, s)
+		} else {
+			inProgress = append(inProgress, s)
+		}
+	}
+
+	sort.Slice(complete, func(i, j int) bool {
+		return complete[i].Score > complete[j].Score
+	})
 
 	viewData := struct {
 		Completed  []models.Session
 		InProgress []models.Session
 	}{
-		Completed:  sessions,
-		InProgress: []models.Session{},
+		Completed:  complete,
+		InProgress: inProgress,
 	}
 
 	Render([]string{"main_layout", path.Join("sessions", "list")}, gctx.Writer, viewData)
