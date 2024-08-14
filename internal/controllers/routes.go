@@ -57,6 +57,13 @@ func GetRoutes() Routes {
 			Format:  "html",
 			Handler: (&QuestionController{}).Answer,
 		},
+		Route{
+			Name:    "SessionList",
+			Method:  "GET",
+			Path:    "/leaderboard",
+			Format:  "html",
+			Handler: (&SessionController{}).List,
+		},
 	}
 
 	return routes

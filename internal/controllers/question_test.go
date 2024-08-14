@@ -108,6 +108,7 @@ var _ = Describe("QuestionController test", func() {
 						Text:         "some question",
 						StartedAt:    time.Now().Add(1 * time.Hour),
 						SessionEmail: session.Email,
+						RightAnswer:  2,
 					}
 					err = controllers.Settings.DB.Save(&question).Error
 					Expect(err).ToNot(HaveOccurred())
@@ -130,6 +131,13 @@ var _ = Describe("QuestionController test", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(question.UserAnswer).To(Equal(2))
+
+					// Reload session
+					err = controllers.Settings.DB.Find(&session).Error
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(session.Score).To(Equal(100)) // 100% correct
+					Expect(session.Complete).To(BeTrue())
 				})
 
 				When("the answer param is empty", func() {

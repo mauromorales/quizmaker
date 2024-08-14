@@ -2,17 +2,29 @@
 
 [[define "body"]]
 <div class="flex justify-center">
-<form class="space-y-4 w-full max-w-sm" action="[[ .SubmitURL ]]" method="post">
-    <div class="flex items-center border-b border-teal-500 py-2">
-    <input class="appearance-none bg-transparent border-none w-full mr-3 py-1 px-2 leading-tight focus:outline-none" type="email" id="email" name="email" required placeholder="Your e-mail" aria-label="Email">
-    <button class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
-        Start Quiz
-    </button>
-    </div>
-    <p class="text-sm text-gray-400 mt-4">
-    Your email is required to contact you about your prize if you win the quiz. We respect your privacy and will not share your email with third parties.
-    </p>
-</form>
+    <form class="space-y-4 w-full max-w-sm" action="[[ .SubmitURL ]]" method="post">
+        <!-- Nickname field -->
+        <div class="flex items-center border-b border-teal-500 py-2">
+            <input class="appearance-none bg-transparent border-none w-full mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" id="nickname" name="nickname" required placeholder="Your nickname" aria-label="Nickname" maxlength="30">
+        </div>
+
+        <!-- Email field -->
+        <div class="flex items-center border-b border-teal-500 py-2">
+            <input class="appearance-none bg-transparent border-none w-full mr-3 py-1 px-2 leading-tight focus:outline-none" type="email" id="email" name="email" required placeholder="Your e-mail" aria-label="Email">
+        </div>
+
+        <!-- Submit button -->
+        <div class="flex justify-center">
+            <button class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
+                Start Quiz
+            </button>
+        </div>
+
+        <!-- Privacy notice -->
+        <p class="text-sm text-gray-400 mt-4 text-center">
+            Your email is required to contact you about your prize if you win the quiz. We respect your privacy and will not share your email with third parties.
+        </p>
+    </form>
 </div>
 [[end]]
 

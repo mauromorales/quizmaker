@@ -173,6 +173,7 @@ func ensureQuizSession(ctx *gin.Context) (models.Session, error) {
 	var session models.Session
 
 	submittedEmail := ctx.Request.FormValue("email")
+	submittedNickname := ctx.Request.FormValue("nickname")
 
 	cookieValue, err := validCookieValue(ctx)
 	if errors.Is(err, http.ErrNoCookie) { // no cookie found
@@ -181,7 +182,7 @@ func ensureQuizSession(ctx *gin.Context) (models.Session, error) {
 			return session, errors.New("email has already been used previously")
 		}
 
-		return newSessionForEmail(ctx, submittedEmail) // fresh email
+		return newSession(ctx, submittedEmail, submittedNickname) // fresh email
 	}
 	if err != nil { // other errors (expired or invalid cookie)
 		return session, err
@@ -197,7 +198,7 @@ func ensureQuizSession(ctx *gin.Context) (models.Session, error) {
 	// User has a valid cookie but we can't find a session.
 	// Create a new one (we probably deleted the session from db).
 	if err != nil {
-		return newSessionForEmail(ctx, cookieValue.Email)
+		return newSession(ctx, cookieValue.Email, submittedNickname)
 	}
 
 	return session, nil
@@ -216,11 +217,11 @@ func validTimestamp(timestampStr string) error {
 	return nil
 }
 
-func newSessionForEmail(ctx *gin.Context, email string) (models.Session, error) {
+func newSession(ctx *gin.Context, email, nickname string) (models.Session, error) {
 	var err error
 	var result models.Session
 
-	result, err = models.NewSessionForEmail(Settings.DB, email)
+	result, err = models.NewSession(Settings.DB, email, nickname)
 	if err != nil {
 		return result, fmt.Errorf("creating a new session: %w", err)
 	}

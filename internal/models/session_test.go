@@ -207,4 +207,59 @@ var _ = Describe("Session", func() {
 			})
 		})
 	})
+
+	Describe("#UpdateCacheColumns", func() {
+		BeforeEach(func() {
+			session.Questions = []Question{
+				{
+					Text:           "started, expired, not answered",
+					StartedAt:      time.Now().Add(-10 * time.Second),
+					AllowedSeconds: 5,
+					UserAnswer:     0,
+					RightAnswer:    2,
+				},
+				{
+					Text:           "not started",
+					AllowedSeconds: 5,
+				},
+				{
+					Text:           "started, not answered, not expired",
+					StartedAt:      time.Now(),
+					AllowedSeconds: 1000000,
+				},
+				{
+					Text:           "correctly answered",
+					StartedAt:      time.Now().Add(-10 * time.Second),
+					AllowedSeconds: 1,
+					UserAnswer:     2,
+					RightAnswer:    2,
+				},
+				{
+					Text:           "wrongly answered",
+					StartedAt:      time.Now().Add(-10 * time.Second),
+					AllowedSeconds: 1,
+					UserAnswer:     1,
+					RightAnswer:    2,
+				},
+			}
+		})
+
+		It("updates the Score field", func() {
+			Expect(session.Score).To(BeZero())
+			Expect(session.Complete).To(BeFalse())
+			session.UpdateCacheColumns()
+			Expect(session.Score).To(Equal(33))
+			Expect(session.Complete).To(BeFalse())
+		})
+
+		It("updated the Complete field", func() {
+			for i := range session.Questions {
+				session.Questions[i].StartedAt = time.Now().Add(-10 * time.Second)
+				session.Questions[i].UserAnswer = 2
+			}
+			Expect(session.Complete).To(BeFalse())
+			session.UpdateCacheColumns()
+			Expect(session.Complete).To(BeTrue())
+		})
+	})
 })
