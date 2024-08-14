@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jimmykarily/quizmaker/internal/models"
+	"gorm.io/gorm/clause"
 )
 
 type (
@@ -48,6 +49,18 @@ func (c *QuestionController) Answer(gctx *gin.Context) {
 		}
 
 		err = Settings.DB.Save(&question).Error
+		if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+			return
+		}
+
+		// reload session
+		err = Settings.DB.Preload(clause.Associations).Find(&session).Error
+		if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+			return
+		}
+		s := &session
+		s.UpdateCacheColumns()
+		err = Settings.DB.Save(s).Error
 		if handleError(gctx.Writer, err, http.StatusInternalServerError) {
 			return
 		}

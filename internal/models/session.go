@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"fmt"
+	"math"
 	"regexp"
 	"sort"
 	"strings"
@@ -14,6 +15,8 @@ type Session struct {
 	gorm.Model
 	Email     string
 	Nickname  string
+	Score     int
+	Complete  bool
 	Questions []Question `gorm:"foreignKey:SessionEmail;references:Email"`
 }
 
@@ -88,8 +91,37 @@ func (s Session) CurrentQuestion() (Question, error) {
 	return Question{}, nil
 }
 
-func (s Session) Score() int {
-	return 55
+// UpdateCacheColumns calculates the current "Score" value based only on
+// answered and expired questions. Expired questions with no answer
+// are considered "wrong".
+// It also calculated the value of the "Completed" column. A session is complete
+// when all questions are answered or expired.
+func (s *Session) UpdateCacheColumns() {
+	correctAnswers := 0
+	completeQuestions := 0
+	totalQuestions := len(s.Questions)
+
+	for _, q := range s.Questions {
+		if q.Expired() {
+			completeQuestions++ // consider it a wrong answer
+			continue
+		}
+
+		// ignore not started or in-progress questions (we already handled expired above)
+		if q.StartedAt.IsZero() || q.UserAnswer == 0 {
+			continue
+		}
+
+		if q.UserAnswer == q.RightAnswer {
+			correctAnswers++
+		}
+		completeQuestions++ // right or wrong, count it in
+	}
+
+	if completeQuestions == totalQuestions {
+		s.Complete = true
+	}
+	s.Score = int(math.Round(float64(correctAnswers) / float64(completeQuestions) * 100))
 }
 
 // EmailObfuscated obfuscates an email address by replacing characters with dots,

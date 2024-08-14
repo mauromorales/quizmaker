@@ -32,11 +32,11 @@ type Question struct {
 }
 
 func (q Question) Expired() bool {
-	isStarted := q.StartedAt.IsZero()
+	isStarted := !q.StartedAt.IsZero()
 	outOfTime := int(time.Since(q.StartedAt).Seconds()) > q.AllowedSeconds
 	notAnswered := (q.UserAnswer == 0)
 
-	return !isStarted && outOfTime && notAnswered
+	return isStarted && outOfTime && notAnswered
 }
 
 func (q Question) Valid() bool {
