@@ -23,11 +23,11 @@ type Routes []Route
 func GetRoutes() Routes {
 	routes := Routes{
 		Route{
-			Name:    "Home",
+			Name:    "SessionList",
 			Method:  "GET",
 			Path:    "/",
 			Format:  "html",
-			Handler: (&HomeController{}).Index,
+			Handler: (&SessionController{}).List,
 		},
 		Route{
 			Name:    "QuizNew",
@@ -56,13 +56,6 @@ func GetRoutes() Routes {
 			Path:    "/questions/:id",
 			Format:  "html",
 			Handler: (&QuestionController{}).Answer,
-		},
-		Route{
-			Name:    "SessionList",
-			Method:  "GET",
-			Path:    "/leaderboard",
-			Format:  "html",
-			Handler: (&SessionController{}).List,
 		},
 	}
 

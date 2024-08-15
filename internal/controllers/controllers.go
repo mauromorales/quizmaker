@@ -12,9 +12,11 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/jimmykarily/quizmaker/internal/models"
 	settingspkg "github.com/jimmykarily/quizmaker/internal/settings"
+	"github.com/skip2/go-qrcode"
 )
 
 var Settings settingspkg.Settings
+var QuizNewQRImageMemoization map[string][]byte
 
 // Render renders the given templates using the provided data and writes the result
 // to the provided ResponseWriter.
@@ -133,4 +135,31 @@ func CreateCookie(email, userAgent string) (*http.Cookie, error) {
 		Expires:  time.Now().Add(COOKIE_LIFETIME_SEC * time.Second),
 		HttpOnly: true,
 	}, nil
+}
+
+func getQRCodePNG(url string) ([]byte, error) {
+	var png []byte
+	var cached bool
+	var err error
+
+	png, cached = QuizNewQRImageMemoization[url]
+	if cached && len(QuizNewQRImageMemoization[url]) > 0 {
+		Settings.InfoLogger.Println("Using memoized QR code")
+		return png, nil
+	}
+
+	if png, err = qrcode.Encode(url, qrcode.Medium, 512); err != nil {
+		return png, err
+	}
+
+	if QuizNewQRImageMemoization == nil {
+		Settings.InfoLogger.Println("non initialized map")
+		QuizNewQRImageMemoization = map[string][]byte{
+			url: png,
+		}
+	} else {
+		QuizNewQRImageMemoization[url] = png
+	}
+
+	return png, nil
 }

@@ -1,3 +1,6 @@
+[[define "QRCode"]]
+<!-- No QR code available -->
+[[end]]
 [[define "main_layout"]]
 <!doctype html>
 <html lang="en">
@@ -13,18 +16,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gray-900 text-white flex justify-center min-h-screen">
-  <div class="w-full lg:w-1/2 p-4">
-    <header class="mb-8 text-center">
-      <img src="/assets/images/logo.png" alt="Logo" class="mx-auto w-80">
-    </header>
-    <main class="space-y-4">
-      <div class="bg-gray-800 p-4 rounded shadow-md">
-      [[template "body" .]]
-      </div>
-    </main>
-  </div>
+    <div class="w-full lg:w-1/2 p-4">
+      <header class="mb-8">
+        <div class="flex items-center justify-between">
+          <!-- Logo Section -->
+          <div class="flex-1 flex justify-center">
+            <img src="/assets/images/logo.png" alt="Logo" class="w-80 object-contain">
+          </div>
 
-  [[template "page-javascript" .]]
+          [[template "QRCode" .]]
+        </div>
+      </header>
+
+      <main class="space-y-4">
+        <div class="bg-gray-800 p-4 rounded shadow-md">
+          [[template "body" .]]
+        </div>
+      </main>
+    </div>
+
+    [[template "page-javascript" .]]
   </body>
 </html>
 [[end]]

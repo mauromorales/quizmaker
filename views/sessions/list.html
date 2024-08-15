@@ -1,5 +1,16 @@
 [[define "title"]]
-Leaderboard
+QuizMaker - Leaderboard
+[[end]]
+
+[[define "QRCode"]]
+<div class="flex-1 flex justify-center">
+  <div class="text-center">
+    <p class="text-xl font-medium mb-4">Scan to start a quiz:</p>
+    <a href="[[ .NewQuizURL ]]">
+      <img src="data:image/png;base64,[[ .QRCodePNG ]]" alt="QR Code" class="w-64 h-64">
+    </a>
+  </div>
+</div>
 [[end]]
 
 [[define "body"]]

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/base64"
 	"net/http"
 	"path"
 	"sort"
@@ -33,10 +34,24 @@ func (c *SessionController) List(gctx *gin.Context) {
 		return complete[i].Score > complete[j].Score
 	})
 
+	NewQuizURL, err := GetFullURL(gctx.Request, "QuizNew", nil)
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
+	}
+
+	png, err := getQRCodePNG(NewQuizURL)
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
+	}
+
 	viewData := struct {
+		QRCodePNG  string
+		NewQuizURL string
 		Completed  []models.Session
 		InProgress []models.Session
 	}{
+		QRCodePNG:  base64.StdEncoding.EncodeToString(png),
+		NewQuizURL: NewQuizURL,
 		Completed:  complete,
 		InProgress: inProgress,
 	}

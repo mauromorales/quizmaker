@@ -31,3 +31,4 @@ TODO:
 - Create endpoint that shows the currently active quizzes
 - improve the README
 - Create a leaderboard with aliases (not their emails). This way we can give prizes to 1st/2nd/3rd etc
+- When showing leaderboard, check if any pending sessions are now expired (recalculate the fields), because currently we recalculate the fields only when a question is answers. Abandoned quizzes will show as "in progress" forever this way.
