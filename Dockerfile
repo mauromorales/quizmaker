@@ -11,5 +11,6 @@ COPY --from=builder /bin/quizmaker /bin/quizmaker
 
 WORKDIR /app
 COPY views/ /app/views
+COPY assets/ /app/assets
 
 CMD ["quizmaker"]
