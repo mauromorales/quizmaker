@@ -28,6 +28,7 @@ type Question struct {
 	UserAnswer     int          `yaml:"userAnswer,omitempty"`
 	Answers        Answers      `yaml:"answers,omitempty" gorm:"type:VARCHAR(255)"`
 	AllowedSeconds int          `yaml:"allowedSeconds,omitempty"`
+	Source         string       `yaml:"source,omitempty"`
 	StartedAt      time.Time
 }
 

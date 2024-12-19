@@ -28,7 +28,12 @@
               <!-- Correct Answer -->
               <div class="mb-2">
                 [[ $idx := sub $q.RightAnswer 1 ]]
-                <p class="text-xl">[[ index $q.Answers $idx ]]</p>
+                <p class="text-xl">
+                  [[ index $q.Answers $idx ]]
+                  [[ if not (eq $q.Source "") ]]
+                  <span class="text-sm"><a href="[[ $q.Source ]]" target="_blank" class="text-blue-500 underline">Read the docs</a></span>
+                  [[ end ]]
+                </p>
               </div>
 
               [[ if not (eq $q.RightAnswer $q.UserAnswer) ]]
