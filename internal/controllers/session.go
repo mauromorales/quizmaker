@@ -54,13 +54,13 @@ func (c *SessionController) List(gctx *gin.Context) {
 		NewQuizURL string
 		Completed  []models.Session
 		InProgress []models.Session
-		Prices     models.PricesList
+		Prizes     models.PrizeList
 	}{
 		QRCodePNG:  base64.StdEncoding.EncodeToString(png),
 		NewQuizURL: NewQuizURL,
 		Completed:  complete,
 		InProgress: inProgress,
-		Prices:     qp.Prices,
+		Prizes:     qp.Prizes,
 	}
 
 	Render([]string{"main_layout", path.Join("sessions", "list")}, gctx.Writer, viewData)
