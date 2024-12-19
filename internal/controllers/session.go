@@ -44,16 +44,23 @@ func (c *SessionController) List(gctx *gin.Context) {
 		return
 	}
 
+	qp, err := models.NewQuestionPoolFromFile(Settings.QuestionPoolFile)
+	if handleError(gctx.Writer, err, http.StatusInternalServerError) {
+		return
+	}
+
 	viewData := struct {
 		QRCodePNG  string
 		NewQuizURL string
 		Completed  []models.Session
 		InProgress []models.Session
+		Prices     models.PricesList
 	}{
 		QRCodePNG:  base64.StdEncoding.EncodeToString(png),
 		NewQuizURL: NewQuizURL,
 		Completed:  complete,
 		InProgress: inProgress,
+		Prices:     qp.Prices,
 	}
 
 	Render([]string{"main_layout", path.Join("sessions", "list")}, gctx.Writer, viewData)

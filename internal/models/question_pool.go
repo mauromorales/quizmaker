@@ -7,8 +7,16 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type Price struct {
+	Title       string `yaml:"title,omitempty"`
+	Description string `yaml:"description,omitempty"`
+}
+
+type PricesList []Price
+
 type QuestionPool struct {
 	Questions QuestionList `yaml:"questions,omitempty"`
+	Prices    PricesList   `yaml:"prices,omitempty"`
 }
 
 func NewQuestionPoolFromFile(filePath string) (QuestionPool, error) {

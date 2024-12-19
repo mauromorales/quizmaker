@@ -5,7 +5,6 @@ QuizMaker - Leaderboard
 [[define "QRCode"]]
 <div class="flex-1 flex justify-center">
   <div class="text-center">
-    <p class="text-xl font-medium mb-4">Scan to start a quiz:</p>
     <a href="[[ .NewQuizURL ]]">
       <img src="data:image/png;base64,[[ .QRCodePNG ]]" alt="QR Code" class="w-64 h-64">
     </a>
@@ -14,6 +13,44 @@ QuizMaker - Leaderboard
 [[end]]
 
 [[define "body"]]
+      <div class="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-3">
+        <div class="relative max-lg:row-start-1">
+          <div class="absolute inset-px rounded-lg bg-white"></div>
+          <div class="relative flex h-full flex-col overflow-hidden">
+            <div class="px-8 pb-3 pt-8 sm:px-10 sm:pb-0 sm:pt-10">
+              <p class="mt-2 text-lg font-medium tracking-tight text-gray-950 text-center">Scan to Win!</p>
+            </div>
+            <div class="flex flex-1 items-center [container-type:inline-size] max-lg:py-6 lg:pb-2">
+              [[template "QRCode" .]]
+            </div>
+          </div>
+          <div class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5"></div>
+        </div>
+        [[ if gt (len .Prices) 0 ]]
+        <div class="relative max-lg:row-start-3 lg:col-start-1 lg:row-start-2 row-span-2">
+          <div class="absolute inset-px rounded-lg bg-white"></div>
+          <div class="relative flex h-full flex-col overflow-hidden">
+            <div class="px-8 pb-3 pt-8 sm:px-10 sm:pb-0 sm:pt-10">
+              <p class="mt-2 text-lg font-medium tracking-tight text-gray-950 max-lg:text-center">Prices</p>
+              <p class="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center"></p>
+              <div class="mt-6 border-t border-gray-100">
+                <dl class="divide-y divide-gray-100">
+                  [[ range $price := .Prices ]]
+                  <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm/6 font-medium text-gray-900">[[ $price.Title ]]</dt>
+                    <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">[[ $price.Description ]]</dd>
+                  </div>
+                  [[ end ]]
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5"></div>
+        </div>
+        [[ end ]]
+        <div class="relative lg:row-span-3 lg:col-span-2">
+          <div class="absolute inset-px rounded-lg bg-white"></div>
+          <div class="relative flex h-full flex-col overflow-hidden ">
 <div class="space-y-6">
   <!-- Leaderboard Header -->
   <header class="text-center">
@@ -24,16 +61,16 @@ QuizMaker - Leaderboard
 
   <!-- Completed Quizzes Section -->
   <section>
-    <h2 class="text-xl font-semibold mb-4">Completed Quizzes</h2>
+    <h2 class="text-xl font-semibold mb-4 ml-2">Completed Quizzes</h2>
     <ul class="space-y-2">
       [[range .Completed]]
-      <li class="bg-green-800 p-4 rounded shadow-md flex justify-between">
+      <li class="bg-green-300 p-4 rounded shadow-md flex justify-between rounded-lg">
         <div>
           <p class="font-bold">Nickname: [[.Nickname]]</p>
           <p>Email: [[.EmailObfuscated]]</p>
         </div>
         <div class="text-right">
-          <p class="font-semibold text-green-400">Score: [[.Score]]%</p>
+          <p class="font-semibold text-green-900">Score: [[.Score]]%</p>
         </div>
       </li>
       [[end]]
@@ -42,16 +79,16 @@ QuizMaker - Leaderboard
 
   <!-- In-Progress Quizzes Section -->
   <section>
-    <h2 class="text-xl font-semibold mb-4">In Progress Quizzes</h2>
+    <h2 class="text-xl font-semibold mb-4 ml-2">In Progress Quizzes</h2>
     <ul class="space-y-2">
       [[range .InProgress]]
-      <li class="bg-yellow-800 p-4 rounded shadow-md flex justify-between">
+      <li class="bg-sky-400 p-4 rounded shadow-md flex justify-between rounded-lg">
         <div>
           <p class="font-bold">Nickname: [[.Nickname]]</p>
           <p>Email: [[.EmailObfuscated]]</p>
         </div>
         <div class="text-right">
-          <p class="font-semibold text-yellow-400">Score: [[.Score]]%</p>
+          <p class="font-semibold text-blue-900">Score: [[.Score]]%</p>
         </div>
       </li>
       [[end]]
@@ -59,6 +96,10 @@ QuizMaker - Leaderboard
   </section>
 </div>
 [[end]]
+          </div>
+          <div class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5"></div>
+        </div>
+      </div>
 
 [[define "page-javascript"]]
 <script>
