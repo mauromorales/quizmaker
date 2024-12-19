@@ -1,50 +1,57 @@
 [[define "title"]]Quiz[[end]]
 
 [[define "body"]]
-<div class="bg-gray-800 p-8 relative">
-  <div class="flex items-center justify-between mb-6 border-b border-gray-600 pb-4">
-    <!-- Current Position -->
-    <div class="text-white text-xl font-semibold">
-      Question [[ .CurrentQuestion ]] / [[ .TotalQuestions ]]
-    </div>
+<div class="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-1">
+  <div class="relative max-lg:row-start-1 col-span-3">
+    <div class="absolute inset-px rounded-lg bg-white"></div>
+    <div class="relative flex h-full flex-col overflow-hidden">
+      <div class="px-8 pb-3 pt-8 sm:px-10 sm:pb-10 sm:pt-10">
+        <div class="flex items-center justify-between mb-6 border-b border-gray-600 pb-4">
+          <!-- Current Position -->
+          <div class="text-xl font-semibold">
+            Question [[ .CurrentQuestion ]] / [[ .TotalQuestions ]]
+          </div>
 
-    <!-- Countdown Timer -->
-    <div id="timer" class="bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow-lg">
-      Time Left: <span id="time-value"></span>
-    </div>
-  </div>
+          <!-- Countdown Timer -->
+          <div id="timer" class="bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow-lg">
+            Time Left: <span id="time-value"></span>
+          </div>
+        </div>
 
-  <!-- Container for Question Text -->
-  <div class="flex items-start justify-between">
-    <!-- Question Text -->
-    <div class="ml-6 flex-1">
-      <h2 class="text-2xl font-bold mb-4 break-words w-full">[[ .Question.Text ]]</h2>
-    </div>
-  </div>
+        <!-- Container for Question Text -->
+        <div class="flex items-start justify-between">
+          <!-- Question Text -->
+          <div class="ml-6 flex-1">
+            <h2 class="text-2xl font-bold mb-4 break-words w-full">[[ .Question.Text ]]</h2>
+          </div>
+        </div>
 
-  <div class="space-y-6 mt-4">
-    <form action="[[ .SubmitURL ]]" method="post" class="w-full">
-      <!-- Answer Options -->
-      <div id="answers-container" class="space-y-4 w-full">
-        [[ range $i, $a := .Question.Answers ]]
-          <label class="flex items-center p-4 border border-gray-600 rounded cursor-pointer hover:bg-gray-700 transition-colors w-full">
-            <input type="radio" name="answer" value="[[ add $i 1 ]]" class="form-checkbox text-teal-500 mr-4" required>
-            <span class="text-lg break-words w-full">[[ . ]]</span>
-          </label>
-        [[ end ]]
+        <div class="space-y-6 mt-4">
+          <form action="[[ .SubmitURL ]]" method="post" class="w-full">
+            <!-- Answer Options -->
+            <div id="answers-container" class="space-y-4 w-full">
+              [[ range $i, $a := .Question.Answers ]]
+                <label class="flex items-center p-4 border border-gray-600 rounded cursor-pointer hover:bg-gray-200 transition-colors w-full">
+                  <input type="radio" name="answer" value="[[ add $i 1 ]]" class="form-checkbox text-teal-500 mr-4" required>
+                  <span class="text-lg break-words w-full">[[ . ]]</span>
+                </label>
+              [[ end ]]
+            </div>
+
+            <div class="flex space-x-4 mt-4">
+              <button id="submit-button" type="submit" class="bg-teal-500 hover:bg-teal-700 text-white py-3 px-6 text-lg rounded focus:outline-none focus:ring focus:ring-teal-500">
+                Submit
+              </button>
+              
+              <!-- Next Question Button -->
+              <a id="next-question-button" href="#" class="hidden bg-blue-500 hover:bg-blue-700 text-white py-3 px-6 text-lg rounded focus:outline-none focus:ring focus:ring-blue-500">
+                Next Question
+              </a>
+            </div>
+          </form>
+        </div>
       </div>
-
-      <div class="flex space-x-4 mt-4">
-        <button id="submit-button" type="submit" class="bg-teal-500 hover:bg-teal-700 text-white py-3 px-6 text-lg rounded focus:outline-none focus:ring focus:ring-teal-500">
-          Submit
-        </button>
-        
-        <!-- Next Question Button -->
-        <a id="next-question-button" href="#" class="hidden bg-blue-500 hover:bg-blue-700 text-white py-3 px-6 text-lg rounded focus:outline-none focus:ring focus:ring-blue-500">
-          Next Question
-        </a>
-      </div>
-    </form>
+    </div>
   </div>
 </div>
 [[end]]
